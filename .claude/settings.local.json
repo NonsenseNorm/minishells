@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__list_memories",
+      "mcp__serena__activate_project",
+      "mcp__serena__onboarding",
+      "mcp__serena__list_dir",
+      "mcp__serena__find_file",
+      "mcp__serena__read_file",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__create_text_file",
+      "mcp__serena__execute_shell_command",
+      "mcp__serena__replace_content",
+      "mcp__serena__write_memory",
+      "Bash(make:*)",
+      "Bash(echo:*)",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__find_symbol",
+      "Bash(/tmp/test_signals2.py:*)",
+      "Bash(python3:*)",
+      "Bash(/tmp/debug_signals.py:*)",
+      "mcp__serena__read_memory",
+      "Bash(/usr/bin/python3:*)",
+      "Bash(nm:*)",
+      "Bash(./minishell:*)",
+      "Bash(printf:*)",
+      "Bash(__NEW_LINE_e47528ae483b16f5__ echo 'export bad-name')",
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)",
+      "Bash(/Users/0/minishell/claude/minishell:*)",
+      "Bash(wc:*)"
+    ]
+  }
+}

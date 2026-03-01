@@ -1,0 +1,92 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/24 00:00:00 by stanizak          #+#    #+#             */
+/*   Updated: 2026/02/24 00:00:00 by stanizak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../core/minishell.h"
+
+static void	cmd_not_found(char *name)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(name, 2);
+	ft_putstr_fd(": command not found\n", 2);
+	exit(127);
+}
+
+void	child_exec(t_shell *sh, t_cmd *cmd)
+{
+	char	*path;
+	int		ret;
+
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
+	ret = apply_redirects(sh, cmd->redirects);
+	if (ret != 0)
+		exit(ret);
+	ret = run_builtin(sh, cmd);
+	if (ret >= 0)
+		exit(ret);
+	if (!cmd->argv || !cmd->argv[0])
+		exit(0);
+	path = find_exec_path(sh, cmd->argv[0]);
+	if (!path)
+		cmd_not_found(cmd->argv[0]);
+	execve(path, cmd->argv, sh->env.arr);
+	if (errno == ENOENT && ft_strchr(cmd->argv[0], '/'))
+		exit(ms_perror(cmd->argv[0], NULL, 127));
+	if (errno == ENOENT)
+		exit(127);
+	exit(ms_perror(cmd->argv[0], NULL, 126));
+}
+
+static int	exec_single_parent(t_shell *sh, t_cmd *cmd)
+{
+	int	in_save;
+	int	out_save;
+	int	ret;
+
+	in_save = dup(STDIN_FILENO);
+	out_save = dup(STDOUT_FILENO);
+	ret = apply_redirects(sh, cmd->redirects);
+	if (ret == 0)
+		ret = run_builtin(sh, cmd);
+	dup2(in_save, STDIN_FILENO);
+	dup2(out_save, STDOUT_FILENO);
+	close(in_save);
+	close(out_save);
+	if (ret < 0)
+		ret = 1;
+	return (ret);
+}
+
+static int	exec_no_cmd(t_shell *sh, t_cmd *cmd)
+{
+	int	in_save;
+	int	out_save;
+	int	ret;
+
+	in_save = dup(STDIN_FILENO);
+	out_save = dup(STDOUT_FILENO);
+	ret = apply_redirects(sh, cmd->redirects);
+	dup2(in_save, STDIN_FILENO);
+	dup2(out_save, STDOUT_FILENO);
+	close(in_save);
+	close(out_save);
+	return (ret);
+}
+
+int	exec_pipeline(t_shell *sh, t_pipeline *pl)
+{
+	if (pl->count == 1 && is_parent_builtin(&pl->cmds[0]))
+		return (exec_single_parent(sh, &pl->cmds[0]));
+	if (pl->count == 1 && (!pl->cmds[0].argv || !pl->cmds[0].argv[0]))
+		return (exec_no_cmd(sh, &pl->cmds[0]));
+	return (exec_forked_pipeline(sh, pl));
+}

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(norminette:*)",
+      "Bash(tail:*)",
+      "Bash(grep ft_put:*)",
+      "Bash(make -C /Users/0/signal-less/libft && nm /Users/0/signal-less/libft/libft.a | grep ft_put 2>&1)"
+    ]
+  }
+}

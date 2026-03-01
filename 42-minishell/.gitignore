@@ -1,0 +1,22 @@
+# Output Execution File
+/minishell
+
+# Object files
+*.o
+
+# Libraries
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.so
+*.dylib
+
+# Executables
+*.out
+
+# Debug files
+*.dSYM/
+
+# Other
+TAGS
+*~
