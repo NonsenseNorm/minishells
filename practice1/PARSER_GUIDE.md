@@ -202,7 +202,7 @@ while (tok && tok->type != TOK_PIPE)
         cmd->argv[k++] = tok->value;
     else
     {
-        /* リダイレクト: 次トーククが存在しかつ WORD でなければエラー */
+        /* リダイレクト: 次とーくんが存在しかつ WORD でなければエラー */
         if (!tok->next || tok->next->type != TOK_WORD)
             return (syntax_err(tok->next));
         if (add_redirect(cmd, tok) != 0)

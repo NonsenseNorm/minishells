@@ -37,6 +37,8 @@ void	free_pipeline(t_pipeline *pl)
 		while (r)
 		{
 			next = r->next;
+			if (r->hd_fd >= 0)
+				close(r->hd_fd);
 			free(r);
 			r = next;
 		}
@@ -46,10 +48,6 @@ void	free_pipeline(t_pipeline *pl)
 	pl->cmds = NULL;
 	pl->count = 0;
 }
-
-/* ================================================================
-   エラーヘルパー (実装済み)
-   ================================================================ */
 
 static int	syntax_err(t_token *tok)
 {
@@ -63,10 +61,6 @@ static int	syntax_err(t_token *tok)
 	return (1);
 }
 
-/*
-** add_redirect -- リダイレクト構造体を作って cmd->redirects リストの末尾に追加する。
-** (parse_one の第2パスで使う)
-*/
 static int	add_redirect(t_cmd *cmd, t_token *tok)
 {
 	t_redirect	*r;
@@ -77,6 +71,7 @@ static int	add_redirect(t_cmd *cmd, t_token *tok)
 		return (1);
 	r->type = map_redirect(tok->type);
 	r->target = tok->next->value;
+	r->hd_fd = -1;    /* ヒアドック: heredoc.c が後で設定する */
 	r->next = NULL;
 	if (!cmd->redirects)
 		cmd->redirects = r;
@@ -90,62 +85,63 @@ static int	add_redirect(t_cmd *cmd, t_token *tok)
 	return (0);
 }
 
-/* ================================================================
-   TODO: 以下の関数を実装してください。
-   実装の手順は PARSER_GUIDE.md を参照してください。
-   ================================================================ */
-
-/*
-** count_cmds -- トークンリストのパイプ数 + 1 を返す。
-**   [WORD][PIPE][WORD][PIPE][WORD] → 3
-**
-** Step 1 で実装する。
-*/
 static int	count_cmds(t_token *tok)
 {
 	int	count;
 
-	count = 0;
+	count = 1;
 	while (tok)
 	{
 		if (tok->type == TOK_PIPE)
-			++count;
+			count++;
 		tok = tok->next;
 	}
-	return (count); /* TODO: Step 1 */
+	return (count);
 }
 
-/*
-** parse_one -- トークン列から1コマンド分を解析して cmd を埋める。
-**
-** *tokp は解析開始位置を指す (TOK_PIPE か NULL になるまで進む)。
-** 終了後 *tokp は次の TOK_PIPE (または NULL) を指す。
-**
-** 2パス構成:
-**   第1パス: TOK_WORD の数を数えて argc を求め、argv を malloc する
-**   第2パス: argv と redirects を埋める (add_redirect を使う)
-**
-** Returns 0 on success, 1 on syntax error.
-**
-** Step 3 で実装する。
-*/
 static int	parse_one(t_token **tokp, t_cmd *cmd)
 {
 	t_token	*tok;
 	int		argc;
 	int		k;
 
+	tok = *tokp;
+	argc = 0;
 	while (tok && tok->type != TOK_PIPE)
 	{
+		if (tok->type == TOK_WORD)
+			argc++;
+		else if (is_redirect(tok->type) && tok->next)
+			tok = tok->next;
 		tok = tok->next;
 	}
+	cmd->argv = malloc(sizeof(char *) * (size_t)(argc + 1));
+	if (!cmd->argv)
+		return (1);
+	k = 0;
+	while (k <= argc)
+		cmd->argv[k++] = NULL;
+	cmd->redirects = NULL;
+	tok = *tokp;
+	k = 0;
+	while (tok && tok->type != TOK_PIPE)
+	{
+		if (tok->type == TOK_WORD)
+			cmd->argv[k++] = tok->value;
+		else
+		{
+			if (!tok->next || tok->next->type != TOK_WORD)
+				return (syntax_err(tok->next));
+			if (add_redirect(cmd, tok) != 0)
+				return (1);
+			tok = tok->next;
+		}
+		tok = tok->next;
+	}
+	*tokp = tok;
+	return (0);
 }
 
-/*
-** parse_cmds -- pl->count 個のコマンドを順に parse_one で解析する。
-** コマンド間の TOK_PIPE をスキップし、余剰トークンがあればエラー。
-** (この関数は完成形。parse_one を実装すると自動的に動く)
-*/
 static int	parse_cmds(t_token *tok, t_pipeline *pl)
 {
 	int	i;
@@ -164,24 +160,13 @@ static int	parse_cmds(t_token *tok, t_pipeline *pl)
 	return (0);
 }
 
-/*
-** parse_pipeline -- パーサーのエントリポイント。
-**
-** 呼び出し構造 (スキャフォールド済み):
-**   count_cmds → malloc → parse_cmds → parse_one
-**
-** Step 1: count_cmds を実装する
-** Step 2: 先頭の NULL / TOK_PIPE チェックを追加する (syntax_err)
-** Step 3: parse_one を実装する
-*/
 int	parse_pipeline(t_token *tok, t_pipeline *pl)
 {
 	pl->cmds = NULL;
 	pl->count = 0;
-	/* TODO: Step 2 — 先頭が NULL または TOK_PIPE なら syntax_err(tok) を返す */
-	if (tok == 0x00 || tok->type == TOK_PIPE)
+	if (!tok || tok->type == TOK_PIPE)
 		return (syntax_err(tok));
-	pl->count = count_cmds(tok); /* Step 1 未実装だと 0 のまま */
+	pl->count = count_cmds(tok);
 	if (pl->count == 0)
 		return (1);
 	pl->cmds = malloc(sizeof(t_cmd) * (size_t)pl->count);
