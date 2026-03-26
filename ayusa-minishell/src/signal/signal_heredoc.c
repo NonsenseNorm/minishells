@@ -1,30 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal_exec.c                                      :+:      :+:    :+:   */
+/*   signal_heredoc.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ayusa <ayusa@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/03/18 18:00:00 by ayusa             #+#    #+#             */
+/*   Updated: 2026/03/18 20:26:11 by ayusa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "../inc/minishell.h"
 
-static void	sig_handler_exec(int sig)
+void	set_signal_heredoc(void)
 {
-	g_sig = sig;
-}
-
-void	sig_set_exec_parent(void)
-{
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_exec);
-}
-
-void	sig_set_exec_child(void)
-{
-	signal(SIGQUIT, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_IGN);
 }
