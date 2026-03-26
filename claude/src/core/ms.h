@@ -106,7 +106,6 @@ typedef struct s_mem
 typedef struct s_shell
 {
 	t_env			env;
-	t_mem			mem;
 	int				exit_code;
 	bool			interactive;
 	bool			term_saved;
@@ -136,15 +135,15 @@ void	sig_set_exec_child(void);
 void	sig_set_heredoc(void);
 
 int		lex_word_end(const char *line, int *i);
-int		lex_line(t_shell *sh, const char *line, t_token **out);
+int		lex_line(t_shell *sh, t_mem *mem, const char *line, t_token **out);
 int		has_quote(const char *s);
 int		is_redirect(t_tok_type t);
-t_redirect_type	map_redirect(t_tok_type t);
-int		parse_cmds(t_shell *sh, t_token *tok, t_pipeline *pl);
-int		parse_pipeline(t_shell *sh, t_token *tok, t_pipeline *pl);
+int		syntax_err(t_shell *sh, t_token *tok);
+int		parse_cmds(t_shell *sh, t_mem *mem, t_token *tok, t_pipeline *pl);
+int		parse_pipeline(t_shell *sh, t_mem *mem, t_token *tok, t_pipeline *pl);
 char	*expand_word(t_shell *sh, const char *s);
 char	*strip_quotes(const char *s);
-int		expand_pipeline(t_shell *sh, t_pipeline *pl);
+int		expand_pipeline(t_shell *sh, t_mem *mem, t_pipeline *pl);
 
 char	*find_exec_path(t_shell *sh, char *cmd);
 int		heredoc_fd(t_shell *sh, char *delim, bool quoted);

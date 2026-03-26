@@ -16,18 +16,24 @@ static int	handle_line(t_shell *sh, char *line)
 {
 	t_token		*tok;
 	t_pipeline	pl;
-	t_mark		mark;
+	t_mem		lex_mem;
+	t_mem		parse_mem;
+	t_mem		exp_mem;
 
-	mem_mark(&sh->mem, &mark);
+	mem_init(&lex_mem);
 	tok = NULL;
-	if (lex_line(sh, line, &tok) != 0)
-		return (mem_pop(&sh->mem, &mark), sh->exit_code);
-	if (parse_pipeline(sh, tok, &pl) != 0)
-		return (mem_pop(&sh->mem, &mark), sh->exit_code);
-	if (expand_pipeline(sh, &pl) != 0)
-		return (mem_pop(&sh->mem, &mark), sh->exit_code);
+	if (lex_line(sh, &lex_mem, line, &tok) != 0)
+		return (mem_reset(&lex_mem), sh->exit_code);
+	mem_init(&parse_mem);
+	if (parse_pipeline(sh, &parse_mem, tok, &pl) != 0)
+		return (mem_reset(&lex_mem), mem_reset(&parse_mem), sh->exit_code);
+	mem_reset(&lex_mem);
+	mem_init(&exp_mem);
+	if (expand_pipeline(sh, &exp_mem, &pl) != 0)
+		return (mem_reset(&parse_mem), mem_reset(&exp_mem), sh->exit_code);
+	mem_reset(&parse_mem);
 	sh->exit_code = exec_pipeline(sh, &pl);
-	mem_pop(&sh->mem, &mark);
+	mem_reset(&exp_mem);
 	return (sh->exit_code);
 }
 
@@ -55,6 +61,14 @@ static char	*read_prompt(t_shell *sh)
 	return (line);
 }
 
+static void	print_exit(t_shell *sh)
+{
+	if (!sh->interactive)
+		return ;
+	write(STDOUT_FILENO, "\033[2K\r", 5);
+	printf("exit\n");
+}
+
 void	ms_loop(t_shell *sh)
 {
 	char	*line;
@@ -80,8 +94,5 @@ void	ms_loop(t_shell *sh)
 		handle_line(sh, line);
 		free(line);
 	}
-	if (sh->interactive)
-		write(STDOUT_FILENO, "\033[2K\r", 5);
-	if (sh->interactive)
-		printf("exit\n");
+	print_exit(sh);
 }

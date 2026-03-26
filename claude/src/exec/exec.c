@@ -12,10 +12,29 @@
 
 #include "../core/ms.h"
 
-void	child_exec(t_shell *sh, t_cmd *cmd)
+static void	exec_not_found(t_shell *sh, t_cmd *cmd)
 {
 	char	*path;
-	int		ret;
+
+	path = find_exec_path(sh, cmd->argv[0]);
+	if (!path)
+	{
+		ms_err("minishell: ");
+		ms_err(cmd->argv[0]);
+		ms_err(": command not found\n");
+		exit(127);
+	}
+	execve(path, cmd->argv, sh->env.arr);
+	if (errno == ENOENT && ft_strchr(cmd->argv[0], '/'))
+		exit(ms_perror(cmd->argv[0], NULL, 127));
+	if (errno == ENOENT)
+		exit(127);
+	exit(ms_perror(cmd->argv[0], NULL, 126));
+}
+
+void	child_exec(t_shell *sh, t_cmd *cmd)
+{
+	int	ret;
 
 	sig_set_exec_child();
 	ret = apply_redirects(sh, cmd->redirects);
@@ -31,20 +50,7 @@ void	child_exec(t_shell *sh, t_cmd *cmd)
 		ms_err("minishell: : command not found\n");
 		exit(127);
 	}
-	path = find_exec_path(sh, cmd->argv[0]);
-	if (!path)
-	{
-		ms_err("minishell: ");
-		ms_err(cmd->argv[0]);
-		ms_err(": command not found\n");
-		exit(127);
-	}
-	execve(path, cmd->argv, sh->env.arr);
-	if (errno == ENOENT && ft_strchr(cmd->argv[0], '/'))
-		exit(ms_perror(cmd->argv[0], NULL, 127));
-	if (errno == ENOENT)
-		exit(127);
-	exit(ms_perror(cmd->argv[0], NULL, 126));
+	exec_not_found(sh, cmd);
 }
 
 static int	exec_single_parent(t_shell *sh, t_cmd *cmd)

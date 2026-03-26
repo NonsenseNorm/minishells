@@ -1,41 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.c                                           :+:      :+:    :+:   */
+/*   signal_exec.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
+/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
 /*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../core/ms.h"
 
-static void	sig_handler_interactive(int sig)
+void	sig_set_exec_parent(void)
 {
-	g_sig = sig;
-	rl_on_new_line();
-	write(STDOUT_FILENO, "\n", 1);
-	rl_replace_line("", 0);
-	rl_done = 1;
-}
-
-static void	sig_handler_record(int sig)
-{
-	g_sig = sig;
-}
-
-void	sig_set_interactive(void)
-{
-	g_sig = 0;
 	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_interactive);
+	signal(SIGINT, SIG_IGN);
 }
 
-void	sig_set_heredoc(void)
+void	sig_set_exec_child(void)
 {
-	g_sig = 0;
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_record);
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
 }

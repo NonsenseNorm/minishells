@@ -6,7 +6,7 @@
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/01/01 00:00:00 by claude           ###   ########.fr       */
+/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,28 @@ int	is_redirect(t_tok_type t)
 		|| t == TOK_REDIRECT_APPEND || t == TOK_HEREDOC);
 }
 
-t_redirect_type	map_redirect(t_tok_type t)
+static const char	*tok_repr(t_token *tok)
 {
-	if (t == TOK_REDIRECT_IN)
-		return (REDIRECT_IN);
-	if (t == TOK_REDIRECT_OUT)
-		return (REDIRECT_OUT);
-	if (t == TOK_REDIRECT_APPEND)
-		return (REDIRECT_APPEND);
-	return (REDIRECT_HEREDOC);
+	if (!tok)
+		return ("newline");
+	if (tok->type == TOK_WORD)
+		return (tok->value);
+	if (tok->type == TOK_PIPE)
+		return ("|");
+	if (tok->type == TOK_REDIRECT_IN)
+		return ("<");
+	if (tok->type == TOK_REDIRECT_OUT)
+		return (">");
+	if (tok->type == TOK_REDIRECT_APPEND)
+		return (">>");
+	return ("<<");
+}
+
+int	syntax_err(t_shell *sh, t_token *tok)
+{
+	ms_err("minishell: syntax error near unexpected token `");
+	ms_err(tok_repr(tok));
+	ms_err("'\n");
+	sh->exit_code = 2;
+	return (1);
 }

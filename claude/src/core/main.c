@@ -12,6 +12,10 @@
 
 #include "ms.h"
 
+#ifndef ECHOCTL
+# define ECHOCTL 0
+#endif
+
 volatile sig_atomic_t	g_sig;
 
 void	ms_term_disable_echoctl(t_shell *sh)
@@ -22,9 +26,7 @@ void	ms_term_disable_echoctl(t_shell *sh)
 		return ;
 	if (tcgetattr(STDIN_FILENO, &term) != 0)
 		return ;
-#ifdef ECHOCTL
 	term.c_lflag &= ~ECHOCTL;
-#endif
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
@@ -42,12 +44,6 @@ static int	init_shell(t_shell *sh, char **envp)
 	sh->term_saved = false;
 	if (env_init(&sh->env, envp) != 0)
 		return (1);
-	mem_init(&sh->mem);
-	if (!sh->mem.top)
-	{
-		env_free(&sh->env);
-		return (1);
-	}
 	if (sh->interactive)
 	{
 		if (tcgetattr(STDIN_FILENO, &sh->term_orig) == 0)
@@ -69,6 +65,5 @@ int	main(int argc, char **argv, char **envp)
 	restore_terminal(&sh);
 	clear_history();
 	env_free(&sh.env);
-	mem_reset(&sh.mem);
 	return (sh.exit_code);
 }

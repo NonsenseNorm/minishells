@@ -1,41 +1,53 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.c                                           :+:      :+:    :+:   */
+/*   mem_str.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
+/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
 /*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../core/ms.h"
 
-static void	sig_handler_interactive(int sig)
+void	mem_mark(t_mem *mem, t_mark *mark)
 {
-	g_sig = sig;
-	rl_on_new_line();
-	write(STDOUT_FILENO, "\n", 1);
-	rl_replace_line("", 0);
-	rl_done = 1;
+	mark->block = mem->top;
+	if (mem->top)
+		mark->used = mem->top->used;
+	else
+		mark->used = 0;
 }
 
-static void	sig_handler_record(int sig)
+void	mem_pop(t_mem *mem, t_mark *mark)
 {
-	g_sig = sig;
+	t_block	*b;
+
+	while (mem->top && mem->top != mark->block)
+	{
+		b = mem->top;
+		mem->top = b->prev;
+		free(b);
+	}
+	if (mem->top)
+		mem->top->used = mark->used;
 }
 
-void	sig_set_interactive(void)
+char	*ms_strndup(t_mem *mem, const char *s, size_t n)
 {
-	g_sig = 0;
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_interactive);
+	char	*out;
+
+	out = ms_alloc(mem, n + 1);
+	if (!out)
+		return (NULL);
+	ft_memcpy(out, s, n);
+	out[n] = 0;
+	return (out);
 }
 
-void	sig_set_heredoc(void)
+char	*ms_strdup(t_mem *mem, const char *s)
 {
-	g_sig = 0;
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_record);
+	return (ms_strndup(mem, s, ft_strlen(s)));
 }

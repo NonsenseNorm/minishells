@@ -6,48 +6,22 @@
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/01/01 00:00:00 by claude           ###   ########.fr       */
+/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../core/ms.h"
 
-static const char	*tok_repr(t_token *tok)
-{
-	if (!tok)
-		return ("newline");
-	if (tok->type == TOK_WORD)
-		return (tok->value);
-	if (tok->type == TOK_PIPE)
-		return ("|");
-	if (tok->type == TOK_REDIRECT_IN)
-		return ("<");
-	if (tok->type == TOK_REDIRECT_OUT)
-		return (">");
-	if (tok->type == TOK_REDIRECT_APPEND)
-		return (">>");
-	return ("<<");
-}
-
-static int	syntax_err(t_shell *sh, t_token *tok)
-{
-	ms_err("minishell: syntax error near unexpected token `");
-	ms_err(tok_repr(tok));
-	ms_err("'\n");
-	sh->exit_code = 2;
-	return (1);
-}
-
-static int	add_redirect(t_shell *sh, t_cmd *cmd, t_token *tok)
+static int	add_redirect(t_mem *mem, t_cmd *cmd, t_token *tok)
 {
 	t_redirect	*r;
 	t_redirect	*cur;
 
-	r = ms_alloc(&sh->mem, sizeof(*r));
+	r = ms_alloc(mem, sizeof(*r));
 	if (!r)
 		return (1);
-	r->type = map_redirect(tok->type);
-	r->target = tok->next->value;
+	r->type = (t_redirect_type)(tok->type - TOK_REDIRECT_IN);
+	r->target = ms_strdup(mem, tok->next->value);
 	r->quoted = has_quote(tok->next->value);
 	r->next = NULL;
 	if (!cmd->redirects)
@@ -62,16 +36,11 @@ static int	add_redirect(t_shell *sh, t_cmd *cmd, t_token *tok)
 	return (0);
 }
 
-static int	parse_one(t_shell *sh, t_token **tokp, t_cmd *cmd)
+static int	count_argc(t_token *tok)
 {
-	t_token	*tok;
-	int		k;
-	int		argc;
+	int	argc;
 
-	if (*tokp && (*tokp)->type == TOK_PIPE)
-		return (syntax_err(sh, *tokp));
 	argc = 0;
-	tok = *tokp;
 	while (tok && tok->type != TOK_PIPE)
 	{
 		if (tok->type == TOK_WORD)
@@ -80,37 +49,55 @@ static int	parse_one(t_shell *sh, t_token **tokp, t_cmd *cmd)
 			tok = tok->next;
 		tok = tok->next;
 	}
-	cmd->argv = ms_alloc(&sh->mem, sizeof(char *) * (argc + 1));
-	if (!cmd->argv)
-		return (1);
-	ft_bzero(cmd->argv, sizeof(char *) * (argc + 1));
-	cmd->redirects = NULL;
-	tok = *tokp;
+	return (argc);
+}
+
+static int	fill_cmd(t_shell *sh, t_mem *mem, t_cmd *cmd, t_token **tokp)
+{
+	t_token	*cur;
+	int		k;
+
+	cur = *tokp;
 	k = 0;
-	while (tok && tok->type != TOK_PIPE)
+	while (cur && cur->type != TOK_PIPE)
 	{
-		if (tok->type == TOK_WORD)
-			cmd->argv[k++] = tok->value;
-		else if (!tok->next || tok->next->type != TOK_WORD)
-			return (syntax_err(sh, tok->next));
-		else if (add_redirect(sh, cmd, tok) != 0)
+		if (cur->type == TOK_WORD)
+			cmd->argv[k++] = ms_strdup(mem, cur->value);
+		else if (!cur->next || cur->next->type != TOK_WORD)
+			return (syntax_err(sh, cur->next));
+		else if (add_redirect(mem, cmd, cur) != 0)
 			return (1);
-		if (is_redirect(tok->type))
-			tok = tok->next;
-		tok = tok->next;
+		if (is_redirect(cur->type))
+			cur = cur->next;
+		cur = cur->next;
 	}
-	*tokp = tok;
+	*tokp = cur;
 	return (0);
 }
 
-int	parse_cmds(t_shell *sh, t_token *tok, t_pipeline *pl)
+static int	parse_one(t_shell *sh, t_mem *mem, t_token **tokp, t_cmd *cmd)
+{
+	int	n;
+
+	if (*tokp && (*tokp)->type == TOK_PIPE)
+		return (syntax_err(sh, *tokp));
+	n = count_argc(*tokp);
+	cmd->argv = ms_alloc(mem, sizeof(char *) * (n + 1));
+	if (!cmd->argv)
+		return (1);
+	cmd->argv[n] = NULL;
+	cmd->redirects = NULL;
+	return (fill_cmd(sh, mem, cmd, tokp));
+}
+
+int	parse_cmds(t_shell *sh, t_mem *mem, t_token *tok, t_pipeline *pl)
 {
 	int	i;
 
 	i = 0;
 	while (i < pl->count)
 	{
-		if (parse_one(sh, &tok, &pl->cmds[i]) != 0)
+		if (parse_one(sh, mem, &tok, &pl->cmds[i]) != 0)
 			return (1);
 		if (tok && tok->type == TOK_PIPE)
 			tok = tok->next;

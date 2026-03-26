@@ -13,28 +13,36 @@
 #include "libft.h"
 #include <limits.h>
 
+static int	skip_ws_sign(const char **s)
+{
+	while (ft_isspace((unsigned char)**s))
+		(*s)++;
+	if (**s == '-')
+		return ((*s)++, -1);
+	if (**s == '+')
+		(*s)++;
+	return (1);
+}
+
 long	ft_atol(const char *s, int *ok)
 {
 	long	n;
 	int		sign;
 
 	*ok = 1;
-	while (ft_isspace((unsigned char)*s))
-		s++;
-	sign = 1;
-	if (*s == '-' || *s == '+')
-	{
-		if (*s == '-')
-			sign = -1;
-		s++;
-	}
+	sign = skip_ws_sign(&s);
 	if (!ft_isdigit((unsigned char)*s))
 		return (*ok = 0, 0);
 	n = 0;
 	while (ft_isdigit((unsigned char)*s))
 	{
 		if (n > (LONG_MAX - (*s - '0')) / 10)
-			return (*ok = 0, sign == 1 ? LONG_MAX : LONG_MIN);
+		{
+			*ok = 0;
+			if (sign == 1)
+				return (LONG_MAX);
+			return (LONG_MIN);
+		}
 		n = n * 10 + (*s - '0');
 		s++;
 	}

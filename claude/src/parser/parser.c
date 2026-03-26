@@ -40,15 +40,15 @@ static int	syntax_error_unexpected(t_shell *sh, t_token *tok)
 	return (1);
 }
 
-int	parse_pipeline(t_shell *sh, t_token *tok, t_pipeline *pl)
+int	parse_pipeline(t_shell *sh, t_mem *mem, t_token *tok, t_pipeline *pl)
 {
 	if (!tok || tok->type == TOK_PIPE)
 		return (syntax_error_unexpected(sh, tok));
 	pl->count = count_cmds(tok);
-	pl->cmds = ms_alloc(&sh->mem, sizeof(t_cmd) * pl->count);
+	pl->cmds = ms_alloc(mem, sizeof(t_cmd) * pl->count);
 	if (!pl->cmds)
 		return (1);
-	if (parse_cmds(sh, tok, pl) != 0)
+	if (parse_cmds(sh, mem, tok, pl) != 0)
 		return (sh->exit_code = 2, 1);
 	return (0);
 }
