@@ -78,6 +78,8 @@ int	exec_pipeline(t_shell *sh, t_pipeline *pl)
 	int	ret;
 
 	sig_set_exec_parent();
+	if (gather_heredocs(sh, pl) != 0)
+		return (sig_set_interactive(), sh->exit_code);
 	if (pl->count == 1 && is_parent_builtin(&pl->cmds[0]))
 		ret = exec_single_parent(sh, &pl->cmds[0]);
 	else if (pl->count == 1 && (!pl->cmds[0].argv || !pl->cmds[0].argv[0]))

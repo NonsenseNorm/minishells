@@ -59,10 +59,19 @@ static void	heredoc_write(t_shell *sh, int fd, char *line, bool quoted)
 	free(line);
 }
 
+static void	heredoc_eof_warning(char *delim)
+{
+	write(STDERR_FILENO, "\nminishell: warning: here-document delimited"
+		" by end-of-file (wanted `", 69);
+	write(STDERR_FILENO, delim, ft_strlen(delim));
+	write(STDERR_FILENO, "')\n", 3);
+}
+
 int	heredoc_fd(t_shell *sh, char *delim, bool quoted)
 {
 	int		p[2];
 	char	*line;
+	int		was_sigint;
 
 	if (pipe(p) != 0)
 		return (-1);
@@ -72,16 +81,79 @@ int	heredoc_fd(t_shell *sh, char *delim, bool quoted)
 		if (isatty(STDIN_FILENO))
 			write(1, "> ", 2);
 		line = read_heredoc_line();
-		if (!line || g_sig == SIGINT || !ft_strcmp(line, delim))
+		if (g_sig == SIGINT)
+		{
+			if (line)
+				free(line);
+			write(STDOUT_FILENO, "^C\n", 3);
 			break ;
+		}
+		if (!line)
+		{
+			heredoc_eof_warning(delim);
+			break ;
+		}
+		if (!ft_strcmp(line, delim))
+		{
+			free(line);
+			break ;
+		}
 		heredoc_write(sh, p[1], line, quoted);
 		line = NULL;
 	}
-	if (line)
-		free(line);
+	was_sigint = (g_sig == SIGINT);
 	close(p[1]);
 	sig_set_interactive();
-	if (g_sig == SIGINT)
+	if (was_sigint)
 		return (close(p[0]), sh->exit_code = 130, -1);
 	return (p[0]);
+}
+
+void	close_pipeline_heredocs(t_pipeline *pl)
+{
+	t_redirect	*r;
+	int			i;
+
+	i = 0;
+	while (i < pl->count)
+	{
+		r = pl->cmds[i].redirects;
+		while (r)
+		{
+			if (r->type == REDIRECT_HEREDOC && r->fd >= 0)
+			{
+				close(r->fd);
+				r->fd = -1;
+			}
+			r = r->next;
+		}
+		i++;
+	}
+}
+
+int	gather_heredocs(t_shell *sh, t_pipeline *pl)
+{
+	t_redirect	*r;
+	int			i;
+
+	i = 0;
+	while (i < pl->count)
+	{
+		r = pl->cmds[i].redirects;
+		while (r)
+		{
+			if (r->type == REDIRECT_HEREDOC)
+			{
+				r->fd = heredoc_fd(sh, r->target, r->quoted);
+				if (r->fd < 0)
+				{
+					close_pipeline_heredocs(pl);
+					return (-1);
+				}
+			}
+			r = r->next;
+		}
+		i++;
+	}
+	return (0);
 }

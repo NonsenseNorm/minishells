@@ -102,6 +102,7 @@ int	exec_forked_pipeline(t_shell *sh, t_pipeline *pl)
 	sig_set_exec_parent();
 	if (fork_all(sh, pl, pids) != 0)
 		return (free(pids), 1);
+	close_pipeline_heredocs(pl);
 	ret = wait_all(pids, pl->count);
 	free(pids);
 	sig_set_interactive();

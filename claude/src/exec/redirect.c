@@ -19,7 +19,7 @@ static int	open_out(char *path, int app)
 	return (open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644));
 }
 
-static int	open_redirect(t_shell *sh, t_redirect *r)
+static int	open_redirect(t_redirect *r)
 {
 	if (r->type == REDIRECT_IN)
 		return (open(r->target, O_RDONLY));
@@ -27,7 +27,7 @@ static int	open_redirect(t_shell *sh, t_redirect *r)
 		return (open_out(r->target, 0));
 	if (r->type == REDIRECT_APPEND)
 		return (open_out(r->target, 1));
-	return (heredoc_fd(sh, r->target, r->quoted));
+	return (r->fd);
 }
 
 int	apply_redirects(t_shell *sh, t_redirect *r)
@@ -36,7 +36,7 @@ int	apply_redirects(t_shell *sh, t_redirect *r)
 
 	while (r)
 	{
-		fd = open_redirect(sh, r);
+		fd = open_redirect(r);
 		if (fd < 0)
 		{
 			if (r->type == REDIRECT_HEREDOC && sh->exit_code == 130)

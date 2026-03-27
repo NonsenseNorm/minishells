@@ -23,6 +23,7 @@ static int	add_redirect(t_mem *mem, t_cmd *cmd, t_token *tok)
 	r->type = (t_redirect_type)(tok->type - TOK_REDIRECT_IN);
 	r->target = ms_strdup(mem, tok->next->value);
 	r->quoted = has_quote(tok->next->value);
+	r->fd = -1;
 	r->next = NULL;
 	if (!cmd->redirects)
 		cmd->redirects = r;

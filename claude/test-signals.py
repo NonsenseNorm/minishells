@@ -281,6 +281,59 @@ def cc_11():
     record("CC-11", "BC-C4: Ctrl+C 後 Enter -> $?=130 のまま",
            passed, "$?=130", f"$?={ec}")
 
+def cc_12():
+    """EC-C3b: Ctrl+C during heredoc -> ^C displayed + $?=130"""
+    # bash は heredoc 入力中の Ctrl+C で ^C を表示する
+    sh = spawn_ms()
+    sh.sendline('cat <<EOF')
+    time.sleep(0.2)
+    sh.send('\x03')
+    try:
+        sh.expect(MS_PROMPT, timeout=3)
+        buf = strip_ansi(sh.before)
+        has_caret = '^C' in buf
+        ec = get_ec(sh, MS_PROMPT)
+        sh.close()
+        passed = has_caret and ec == '130'
+        record("CC-12", "EC-C3b: heredoc 中 Ctrl+C -> ^C 表示 + $?=130",
+               passed, "^C in output, $?=130",
+               f"^C={'yes' if has_caret else 'no'}, $?={ec}")
+    except pexpect.TIMEOUT:
+        sh.close()
+        record("CC-12", "EC-C3b: heredoc 中 Ctrl+C -> ^C 表示 + $?=130",
+               False, "prompt reappear", "TIMEOUT")
+
+def cc_13():
+    """EC-C3c: Ctrl+C during heredoc -> command NOT executed"""
+    # bash は heredoc を Ctrl+C でキャンセルするとコマンド自体を実行しない。
+    # cat <<EOF > tmpfile で出力リダイレクト先ファイルの生成有無を確認する:
+    # - bash (正常): ファイル未生成
+    # - minishell (バグあり): heredoc_fd が SIGINT を見落とし cat が実行されファイルが生成される
+    testfile = '/tmp/ms_cc13_{}'.format(os.getpid())
+    if os.path.exists(testfile):
+        os.remove(testfile)
+    sh = spawn_ms()
+    sh.sendline('cat <<EOF > {}'.format(testfile))
+    time.sleep(0.2)
+    sh.send('\x03')
+    try:
+        sh.expect(MS_PROMPT, timeout=3)
+        ec = get_ec(sh, MS_PROMPT)
+        sh.close()
+        file_created = os.path.exists(testfile)
+        if file_created:
+            os.remove(testfile)
+        passed = not file_created and ec == '130'
+        record("CC-13", "EC-C3c: heredoc 中 Ctrl+C -> コマンド未実行（ファイル未生成） + $?=130",
+               passed, "file not created, $?=130",
+               f"file_created={'yes' if file_created else 'no'}, $?={ec}")
+    except pexpect.TIMEOUT:
+        sh.close()
+        if os.path.exists(testfile):
+            os.remove(testfile)
+        record("CC-13", "EC-C3c: heredoc 中 Ctrl+C -> コマンド未実行（ファイル未生成） + $?=130",
+               False, "prompt reappear", "TIMEOUT")
+
 # ── Ctrl+D Tests ──────────────────────────────────────────────────────────────
 
 def cd_01():
@@ -305,7 +358,10 @@ def cd_02():
     sh = spawn_ms()
     sh.send('hello')
     time.sleep(0.1)
-    sh.send('\x04')  # Ctrl+D (should delete 'o')
+    # カーソルを1つ左に移動してから Ctrl+D を送る（末尾では削除対象の文字がないため）
+    sh.send('\x1b[D')  # ← キー: カーソルを 'o' の上に移動 (rl_point=4)
+    time.sleep(0.05)
+    sh.send('\x04')    # Ctrl+D: カーソル位置の 'o' を削除
     time.sleep(0.1)
     # Shell should still be alive; send Ctrl+C to get back to prompt
     sh.send('\x03')
@@ -373,7 +429,10 @@ def cd_05():
     sh = spawn_ms()
     sh.send('a')
     time.sleep(0.1)
-    sh.send('\x04')  # should delete 'a'
+    # カーソルを 'a' の上に移動してから Ctrl+D を送る（末尾では削除対象の文字がないため）
+    sh.send('\x1b[D')  # ← キー: カーソルを 'a' の上に移動 (rl_point=0)
+    time.sleep(0.05)
+    sh.send('\x04')    # Ctrl+D: 'a' を削除 → rl_end=0
     time.sleep(0.1)
     # now send Ctrl+D again on empty line -> should exit
     sh.sendeof()
@@ -467,6 +526,8 @@ def main():
     cc_09()
     cc_10()
     cc_11()
+    cc_12()
+    cc_13()
 
     print("\n── Ctrl+D Tests ──────────────────────────────────────────")
     cd_01()

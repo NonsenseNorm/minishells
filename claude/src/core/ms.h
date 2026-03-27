@@ -62,6 +62,7 @@ typedef struct s_redirect
 	t_redirect_type		type;
 	char				*target;
 	bool				quoted;
+	int					fd;
 	struct s_redirect	*next;
 }	t_redirect;
 
@@ -147,6 +148,8 @@ int		expand_pipeline(t_shell *sh, t_mem *mem, t_pipeline *pl);
 
 char	*find_exec_path(t_shell *sh, char *cmd);
 int		heredoc_fd(t_shell *sh, char *delim, bool quoted);
+void	close_pipeline_heredocs(t_pipeline *pl);
+int		gather_heredocs(t_shell *sh, t_pipeline *pl);
 int		apply_redirects(t_shell *sh, t_redirect *r);
 int		exec_forked_pipeline(t_shell *sh, t_pipeline *pl);
 void	child_exec(t_shell *sh, t_cmd *cmd);

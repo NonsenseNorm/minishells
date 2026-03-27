@@ -35,7 +35,12 @@ void	sig_set_interactive(void)
 
 void	sig_set_heredoc(void)
 {
+	struct sigaction	sa;
+
 	g_sig = 0;
 	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_record);
+	sa.sa_handler = sig_handler_record;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
 }
