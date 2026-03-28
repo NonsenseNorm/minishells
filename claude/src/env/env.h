@@ -1,30 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal_exec.c                                      :+:      :+:    :+:   */
+/*   env.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/03/28 00:00:00 by claude            #+#    #+#             */
+/*   Updated: 2026/03/28 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "signal.h"
+#ifndef ENV_H
+# define ENV_H
 
-static void	sig_handler_exec(int sig)
-{
-	g_sig = sig;
-}
+# include "../root.h"
 
-void	sig_set_exec_parent(void)
-{
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_exec);
-}
+int		env_init(t_env *env, char **environ);
+void	env_free(t_env *env);
+char	*env_get(t_env *env, const char *key);
+int		env_set(t_env *env, const char *key, const char *val, bool exp);
+int		env_unset(t_env *env, const char *key);
+int		env_grow(t_env *env);
 
-void	sig_set_exec_child(void)
-{
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
-}
+#endif

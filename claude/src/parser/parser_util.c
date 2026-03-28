@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "parser_internal.h"
+#include "../core/core.h"
 
 int	has_quote(const char *s)
 {

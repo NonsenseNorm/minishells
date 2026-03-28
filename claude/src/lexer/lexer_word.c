@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "lexer_internal.h"
 
 int	lex_word_end(const char *line, int *i)
 {

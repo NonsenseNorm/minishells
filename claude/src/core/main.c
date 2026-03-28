@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ms.h"
+#include "core_internal.h"
+#include "../env/env.h"
 
 #ifndef ECHOCTL
 # define ECHOCTL 0

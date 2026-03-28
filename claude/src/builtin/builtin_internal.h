@@ -1,30 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal_exec.c                                      :+:      :+:    :+:   */
+/*   builtin_internal.h                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/03/28 00:00:00 by claude            #+#    #+#             */
+/*   Updated: 2026/03/28 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "signal.h"
+#ifndef BUILTIN_INTERNAL_H
+# define BUILTIN_INTERNAL_H
 
-static void	sig_handler_exec(int sig)
-{
-	g_sig = sig;
-}
+# include "builtin.h"
 
-void	sig_set_exec_parent(void)
-{
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_exec);
-}
+int	valid_ident(const char *s);
+int	bi_echo(t_cmd *cmd);
+int	bi_cd(t_shell *sh, t_cmd *cmd);
+int	bi_pwd(void);
+int	bi_export(t_shell *sh, t_cmd *cmd);
+int	bi_unset(t_shell *sh, t_cmd *cmd);
+int	bi_env(t_shell *sh, t_cmd *cmd);
+int	bi_exit(t_shell *sh, t_cmd *cmd);
 
-void	sig_set_exec_child(void)
-{
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
-}
+#endif

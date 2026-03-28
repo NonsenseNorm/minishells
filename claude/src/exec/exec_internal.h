@@ -1,30 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal_exec.c                                      :+:      :+:    :+:   */
+/*   exec_internal.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/03/28 00:00:00 by claude            #+#    #+#             */
+/*   Updated: 2026/03/28 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "signal.h"
+#ifndef EXEC_INTERNAL_H
+# define EXEC_INTERNAL_H
 
-static void	sig_handler_exec(int sig)
-{
-	g_sig = sig;
-}
+# include "exec.h"
 
-void	sig_set_exec_parent(void)
-{
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_exec);
-}
+char	*find_exec_path(t_shell *sh, char *cmd);
+void	child_exec(t_shell *sh, t_cmd *cmd);
+int		exec_forked_pipeline(t_shell *sh, t_pipeline *pl);
+int		apply_redirects(t_shell *sh, t_redirect *r);
 
-void	sig_set_exec_child(void)
-{
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
-}
+#endif

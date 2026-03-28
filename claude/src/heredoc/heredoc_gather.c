@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "heredoc.h"
 
 void	close_pipeline_heredocs(t_pipeline *pl)
 {

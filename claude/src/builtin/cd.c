@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "builtin_internal.h"
+#include "../env/env.h"
+#include "../core/core.h"
 
 static int	update_pwd(t_shell *sh, char *oldpwd)
 {

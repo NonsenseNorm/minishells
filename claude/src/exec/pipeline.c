@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "exec_internal.h"
+#include "../signal/signal.h"
+#include "../heredoc/heredoc.h"
 
 static int	exit_status(int status)
 {

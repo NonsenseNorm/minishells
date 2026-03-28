@@ -1,30 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal_exec.c                                      :+:      :+:    :+:   */
+/*   core_internal.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/03/28 00:00:00 by claude            #+#    #+#             */
+/*   Updated: 2026/03/28 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "signal.h"
+#ifndef CORE_INTERNAL_H
+# define CORE_INTERNAL_H
 
-static void	sig_handler_exec(int sig)
-{
-	g_sig = sig;
-}
+# include "core.h"
 
-void	sig_set_exec_parent(void)
-{
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_exec);
-}
+void	ms_term_disable_echoctl(t_shell *sh);
+int		ms_loop(t_shell *sh, char *line);
+void	ms_run(t_shell *sh);
 
-void	sig_set_exec_child(void)
-{
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
-}
+#endif

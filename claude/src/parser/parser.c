@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "parser_internal.h"
+#include "../mem/mem.h"
+#include "../core/core.h"
 
 static int	count_cmds(t_token *tok)
 {

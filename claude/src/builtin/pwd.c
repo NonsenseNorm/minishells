@@ -1,30 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal_exec.c                                      :+:      :+:    :+:   */
+/*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/26 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/26 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
+/*   Updated: 2026/03/28 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "signal.h"
+#include "builtin_internal.h"
+#include "../core/core.h"
 
-static void	sig_handler_exec(int sig)
+int	bi_pwd(void)
 {
-	g_sig = sig;
-}
+	char	cwd[PATH_MAX];
 
-void	sig_set_exec_parent(void)
-{
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, sig_handler_exec);
-}
-
-void	sig_set_exec_child(void)
-{
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
+	if (!getcwd(cwd, sizeof(cwd)))
+		return (ms_perror("pwd", NULL, 1));
+	printf("%s\n", cwd);
+	return (0);
 }

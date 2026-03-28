@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "env.h"
 
 static int	find_key(t_env *env, const char *key)
 {

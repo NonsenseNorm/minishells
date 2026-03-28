@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "heredoc_internal.h"
+#include "../expand/expand.h"
 
 char	*heredoc_read_line(void)
 {

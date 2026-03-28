@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "signal.h"
 
 static void	sig_handler_interactive(int sig)
 {

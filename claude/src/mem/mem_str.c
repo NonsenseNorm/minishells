@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "mem.h"
 
 void	mem_mark(t_mem *mem, t_mark *mark)
 {

@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "exec_internal.h"
+#include "../env/env.h"
 
 static char	*join_path(const char *dir, const char *cmd)
 {

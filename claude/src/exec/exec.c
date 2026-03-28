@@ -10,7 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "exec_internal.h"
+#include "../signal/signal.h"
+#include "../heredoc/heredoc.h"
+#include "../builtin/builtin.h"
+#include "../core/core.h"
 
 static void	exec_not_found(t_shell *sh, t_cmd *cmd)
 {

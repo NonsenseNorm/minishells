@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "parser_internal.h"
+#include "../mem/mem.h"
 
 static int	add_redirect(t_mem *mem, t_cmd *cmd, t_token *tok)
 {

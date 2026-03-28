@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "builtin.h"
+#include "builtin_internal.h"
 
 int	is_parent_builtin(t_cmd *cmd)
 {

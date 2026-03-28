@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "exec_internal.h"
+#include "../core/core.h"
 
 static int	open_out(char *path, int app)
 {

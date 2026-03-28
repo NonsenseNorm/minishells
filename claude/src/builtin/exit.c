@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "builtin_internal.h"
 
 int	bi_exit(t_shell *sh, t_cmd *cmd)
 {

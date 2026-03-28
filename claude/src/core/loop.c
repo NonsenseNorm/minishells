@@ -10,7 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ms.h"
+#include "core_internal.h"
+#include "../mem/mem.h"
+#include "../lexer/lexer.h"
+#include "../parser/parser.h"
+#include "../expand/expand.h"
+#include "../exec/exec.h"
+#include "../signal/signal.h"
 
 int	ms_loop(t_shell *sh, char *line)
 {

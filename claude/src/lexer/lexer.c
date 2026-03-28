@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
+#include "lexer_internal.h"
+#include "../mem/mem.h"
+#include "../core/core.h"
 
 static int	push_tok(t_mem *mem, t_tok_type type, char *v, t_token **lst)
 {

@@ -10,11 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../core/ms.h"
-
-extern char	*heredoc_read_line(void);
-extern void	heredoc_write(t_shell *sh, int fd, char *line, bool quoted);
-extern void	heredoc_eof_warning(char *delim);
+#include "heredoc_internal.h"
+#include "../signal/signal.h"
 
 static int	heredoc_loop(t_shell *sh, int wfd, char *delim, bool quoted)
 {
