@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_io.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
+/*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/27 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/29 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/03/27 00:00:00 by stanizak          #+#    #+#             */
+/*   Updated: 2026/03/29 00:44:25 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ void	heredoc_write(t_shell *sh, int fd, char *line, bool quoted)
 
 void	heredoc_eof_warning(char *delim)
 {
-	write(STDERR_FILENO, "\nminishell: warning: here-document delimited"
-		" by end-of-file (wanted `", 69);
+	write(STDERR_FILENO, "minishell: warning: here-document delimited"
+		" by end-of-file (wanted `", 68);
 	write(STDERR_FILENO, delim, ft_strlen(delim));
 	write(STDERR_FILENO, "')\n", 3);
 }

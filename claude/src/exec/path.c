@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
+/*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/01/01 00:00:00 by claude           ###   ########.fr       */
+/*   Created: 2026/01/01 00:00:00 by stanizak          #+#    #+#             */
+/*   Updated: 2026/03/29 00:54:09 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ char	*find_exec_path(t_shell *sh, char *cmd)
 	while (parts[i])
 	{
 		path = join_path(parts[i], cmd);
-		if (path && access(path, X_OK) == 0)
+		if (path && access(path, F_OK) == 0)
 			return (ft_free_split(parts), path);
 		free(path);
 		i++;
