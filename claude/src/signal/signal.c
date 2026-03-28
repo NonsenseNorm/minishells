@@ -21,9 +21,10 @@ static void	sig_handler_interactive(int sig)
 	rl_redisplay();
 }
 
-static void	sig_handler_record(int sig)
+static void	sig_handler_heredoc(int sig)
 {
 	g_sig = sig;
+	close(STDIN_FILENO);
 }
 
 void	sig_set_interactive(void)
@@ -39,7 +40,7 @@ void	sig_set_heredoc(void)
 
 	g_sig = 0;
 	signal(SIGQUIT, SIG_IGN);
-	sa.sa_handler = sig_handler_record;
+	sa.sa_handler = sig_handler_heredoc;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);

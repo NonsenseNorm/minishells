@@ -6,14 +6,14 @@
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/27 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/03/27 00:00:00 by claude           ###   ########.fr       */
+/*   Updated: 2026/03/29 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "heredoc_internal.h"
 #include "../expand/expand.h"
 
-char	*heredoc_read_line(void)
+static char	*heredoc_read_canonical(void)
 {
 	char	buf[2];
 	char	*line;
@@ -40,6 +40,13 @@ char	*heredoc_read_line(void)
 	if (r <= 0 && !*line)
 		return (free(line), NULL);
 	return (line);
+}
+
+char	*heredoc_read_line(void)
+{
+	if (!isatty(STDIN_FILENO))
+		return (heredoc_read_canonical());
+	return (readline("> "));
 }
 
 void	heredoc_write(t_shell *sh, int fd, char *line, bool quoted)
