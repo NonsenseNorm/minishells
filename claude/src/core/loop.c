@@ -45,15 +45,13 @@ int	ms_loop(t_shell *sh, char *line)
 
 static char	*read_prompt(t_shell *sh)
 {
-	char	*prompt;
 	char	*line;
 
 	ms_term_disable_echoctl(sh);
 	if (sh->interactive)
-		prompt = "minishell$ ";
+		line = readline("minishell$ ");
 	else
-		prompt = "";
-	line = readline(prompt);
+		line = get_next_line(STDIN_FILENO);
 	return (line);
 }
 

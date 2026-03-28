@@ -71,5 +71,6 @@ int		ft_strcmp(const char *s1, const char *s2);
 int		ft_isspace(int c);
 long	ft_atol(const char *s, int *ok);
 void	ft_free_split(char **arr);
+char	*get_next_line(int fd);
 
 #endif

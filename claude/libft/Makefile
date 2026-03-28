@@ -20,7 +20,7 @@ SRCS = \
 	ft_strrchr.c ft_strncmp.c ft_memchr.c ft_memcmp.c ft_strnstr.c \
 	ft_atoi.c ft_calloc.c ft_strdup.c ft_substr.c ft_strjoin.c ft_strtrim.c \
 	ft_split.c ft_itoa.c \
-	ft_strcmp.c ft_isspace.c ft_atol.c ft_free_split.c
+	ft_strcmp.c ft_isspace.c ft_atol.c ft_free_split.c get_next_line.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
