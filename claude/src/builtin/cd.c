@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
+/*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/01/01 00:00:00 by claude           ###   ########.fr       */
+/*   Updated: 2026/03/28 20:28:18 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	bi_cd(t_shell *sh, t_cmd *cmd)
 	char	cwd[PATH_MAX];
 	char	*target;
 
-	if (cmd->argv[2])
+	if (cmd->argv[1] != 0x00 && cmd->argv[2])
 		return (fprintf(stderr,
 				"minishell: cd: too many arguments\n"), 1);
 	target = cmd->argv[1];
