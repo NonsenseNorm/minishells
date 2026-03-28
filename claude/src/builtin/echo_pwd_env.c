@@ -12,6 +12,18 @@
 
 #include "../core/ms.h"
 
+static int	is_n_flag(const char *s)
+{
+	int	i;
+
+	if (!s || s[0] != '-' || s[1] == '\0')
+		return (0);
+	i = 1;
+	while (s[i] == 'n')
+		i++;
+	return (s[i] == '\0');
+}
+
 int	bi_echo(t_cmd *cmd)
 {
 	int	i;
@@ -19,7 +31,7 @@ int	bi_echo(t_cmd *cmd)
 
 	i = 1;
 	nl = 1;
-	while (cmd->argv[i] && !ft_strcmp(cmd->argv[i], "-n"))
+	while (cmd->argv[i] && is_n_flag(cmd->argv[i]))
 	{
 		nl = 0;
 		i++;

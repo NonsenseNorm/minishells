@@ -167,7 +167,8 @@ int		bi_exit(t_shell *sh, t_cmd *cmd);
 
 void	ms_err(const char *s);
 int		ms_perror(char *ctx, char *arg, int code);
-void	ms_loop(t_shell *sh);
+int		ms_loop(t_shell *sh, char *line);
+void	ms_run(t_shell *sh);
 void	ms_term_disable_echoctl(t_shell *sh);
 
 #endif

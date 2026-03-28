@@ -6,13 +6,13 @@
 /*   By: claude <claude@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by claude            #+#    #+#             */
-/*   Updated: 2026/01/01 00:00:00 by claude           ###   ########.fr       */
+/*   Updated: 2026/03/28 00:00:00 by claude           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ms.h"
 
-static int	handle_line(t_shell *sh, char *line)
+int	ms_loop(t_shell *sh, char *line)
 {
 	t_token		*tok;
 	t_pipeline	pl;
@@ -51,6 +51,31 @@ static char	*read_prompt(t_shell *sh)
 	return (line);
 }
 
+static void	process_input(t_shell *sh, char *input)
+{
+	char	*ptr;
+	char	*nl;
+
+	ptr = input;
+	nl = ft_strchr(ptr, '\n');
+	while (nl != NULL)
+	{
+		*nl = '\0';
+		if (*ptr)
+		{
+			add_history(ptr);
+			ms_loop(sh, ptr);
+		}
+		ptr = nl + 1;
+		nl = ft_strchr(ptr, '\n');
+	}
+	if (*ptr)
+	{
+		add_history(ptr);
+		ms_loop(sh, ptr);
+	}
+}
+
 static void	print_exit(t_shell *sh)
 {
 	if (!sh->interactive)
@@ -59,30 +84,28 @@ static void	print_exit(t_shell *sh)
 	printf("exit\n");
 }
 
-void	ms_loop(t_shell *sh)
+void	ms_run(t_shell *sh)
 {
-	char	*line;
+	char	*input;
 
 	while (1)
 	{
 		sig_set_interactive();
-		line = read_prompt(sh);
+		input = read_prompt(sh);
 		if (g_sig == SIGINT)
 		{
 			sh->exit_code = 130;
 			g_sig = 0;
 		}
-		if (!line)
+		if (!input)
 			break ;
-		if (*line)
-			add_history(line);
-		else
+		if (!*input)
 		{
-			free(line);
+			free(input);
 			continue ;
 		}
-		handle_line(sh, line);
-		free(line);
+		process_input(sh, input);
+		free(input);
 	}
 	print_exit(sh);
 }

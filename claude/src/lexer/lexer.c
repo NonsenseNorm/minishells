@@ -84,11 +84,11 @@ int	lex_line(t_shell *sh, t_mem *mem, const char *line, t_token **out)
 
 	i = 0;
 	*out = NULL;
-	while (line[i])
+	while (line[i] && line[i] != '\n')
 	{
-		while (line[i] && ft_isspace(line[i]))
+		while (line[i] == ' ' || line[i] == '\t')
 			i++;
-		if (!line[i])
+		if (!line[i] || line[i] == '\n')
 			break ;
 		if (ft_strchr("|<>", line[i]))
 			lex_op(mem, line, &i, out);

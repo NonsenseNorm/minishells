@@ -62,7 +62,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	if (init_shell(&sh, envp) != 0)
 		return (1);
-	ms_loop(&sh);
+	ms_run(&sh);
 	restore_terminal(&sh);
 	clear_history();
 	env_free(&sh.env);
