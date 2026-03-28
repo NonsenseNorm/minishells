@@ -33,7 +33,9 @@
       "Bash(wc:*)",
       "Bash(./parser:*)",
       "Bash(norminette claude:*)",
-      "Bash(valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --error-exitcode=1 ./minishell)"
+      "Bash(valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --error-exitcode=1 ./minishell)",
+      "Bash(norminette:*)",
+      "Bash(find /home/stanizak/minishells -name *.pdf -o -name *subject* -o -name *minishell.md*)"
     ]
   }
 }
