@@ -61,6 +61,7 @@ static void	fork_child(t_shell *sh, t_cmd *cmd, int prev, int p[2])
 		close(p[0]);
 		close(p[1]);
 	}
+	sh->interactive = false;
 	child_exec(sh, cmd);
 }
 
