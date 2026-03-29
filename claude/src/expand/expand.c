@@ -81,16 +81,19 @@ static t_redirect	*expand_redir(t_shell *sh, t_mem *mem, t_redirect *src)
 	dst = ms_alloc(mem, sizeof(*dst));
 	if (!dst)
 		return (NULL);
-	dst->type = src->type;
-	dst->quoted = src->quoted;
-	dst->fd = src->fd;
-	dst->next = NULL;
+	*dst = (t_redirect){src->type, NULL, src->quoted, src->fd, NULL};
 	if (src->type == REDIRECT_HEREDOC)
 		tmp = strip_quotes(src->target);
 	else
 		tmp = expand_word(sh, src->target);
 	if (!tmp)
 		return (NULL);
+	if (src->type != REDIRECT_HEREDOC && !tmp[0])
+	{
+		fprintf(stderr, "minishell: %s: ambiguous redirect\n",
+			src->target);
+		return (free(tmp), NULL);
+	}
 	dst->target = ms_strdup(mem, tmp);
 	free(tmp);
 	if (!dst->target)
