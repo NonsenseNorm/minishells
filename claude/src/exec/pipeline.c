@@ -14,15 +14,30 @@
 #include "../signal/signal.h"
 #include "../heredoc/heredoc.h"
 
+static void	print_signal_msg(int status)
+{
+	int	sig;
+
+	sig = WTERMSIG(status);
+	if (sig == SIGINT)
+		write(STDERR_FILENO, "\n", 1);
+	else if (sig == SIGQUIT)
+	{
+		write(STDERR_FILENO, "Quit", 4);
+		if (WCOREDUMP(status))
+			write(STDERR_FILENO, " (core dumped)", 14);
+		write(STDERR_FILENO, "\n", 1);
+	}
+}
+
 static int	exit_status(int status)
 {
-	if (!WIFSIGNALED(status))
-		return (WEXITSTATUS(status));
-	if (WTERMSIG(status) == SIGINT)
-		write(1, "\n", 1);
-	if (WTERMSIG(status) == SIGQUIT)
-		write(1, "Quit: 3\n", 8);
-	return (128 + WTERMSIG(status));
+	if (WIFSIGNALED(status))
+	{
+		print_signal_msg(status);
+		return (128 + WTERMSIG(status));
+	}
+	return (WEXITSTATUS(status));
 }
 
 static int	wait_all(pid_t *pids, int n)
