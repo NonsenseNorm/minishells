@@ -46,6 +46,8 @@ long	ft_atol(const char *s, int *ok)
 		n = n * 10 + (*s - '0');
 		s++;
 	}
+	while (ft_isspace((unsigned char)*s))
+		s++;
 	if (*s)
 		*ok = 0;
 	return (sign * n);
