@@ -12,6 +12,7 @@
 
 #include "builtin_internal.h"
 #include "../env/env.h"
+#include "../core/core.h"
 
 int	valid_ident(const char *s)
 {
@@ -90,9 +91,9 @@ int	bi_export(t_shell *sh, t_cmd *cmd)
 	{
 		if (!valid_ident(cmd->argv[i]))
 		{
-			fprintf(stderr,
-				"minishell: export: `%s': not a valid identifier\n",
-				cmd->argv[i]);
+			ms_err("minishell: export: `");
+			ms_err(cmd->argv[i]);
+			ms_err("': not a valid identifier\n");
 			ret = 1;
 		}
 		else

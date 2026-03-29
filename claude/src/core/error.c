@@ -17,7 +17,7 @@ void	ms_err(const char *s)
 	write(2, s, ft_strlen(s));
 }
 
-int	ms_perror(char *ctx, char *arg, int code)
+int	ms_error(char *ctx, char *arg, char *msg, int code)
 {
 	ms_err("minishell: ");
 	ms_err(ctx);
@@ -27,7 +27,12 @@ int	ms_perror(char *ctx, char *arg, int code)
 		ms_err(arg);
 	}
 	ms_err(": ");
-	ms_err(strerror(errno));
+	ms_err(msg);
 	ms_err("\n");
 	return (code);
+}
+
+int	ms_perror(char *ctx, char *arg, int code)
+{
+	return (ms_error(ctx, arg, strerror(errno), code));
 }

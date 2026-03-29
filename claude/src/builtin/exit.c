@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "builtin_internal.h"
+#include "../core/core.h"
 
 int	bi_exit(t_shell *sh, t_cmd *cmd)
 {
@@ -24,13 +25,12 @@ int	bi_exit(t_shell *sh, t_cmd *cmd)
 	n = ft_atol(cmd->argv[1], &ok);
 	if (!ok)
 	{
-		fprintf(stderr,
-			"minishell: exit: %s: numeric argument required\n",
-			cmd->argv[1]);
+		ms_error("exit", cmd->argv[1],
+			"numeric argument required", 2);
 		exit(2);
 	}
 	if (cmd->argv[2])
-		return (fprintf(stderr,
-				"minishell: exit: too many arguments\n"), 1);
+		return (ms_error("exit", NULL,
+				"too many arguments", 1));
 	exit((unsigned char)n);
 }

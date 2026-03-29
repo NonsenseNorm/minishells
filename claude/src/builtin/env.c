@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "builtin_internal.h"
+#include "../core/core.h"
 
 int	bi_env(t_shell *sh, t_cmd *cmd)
 {
@@ -18,7 +19,7 @@ int	bi_env(t_shell *sh, t_cmd *cmd)
 
 	if (cmd->argv[1])
 	{
-		fprintf(stderr, "minishell: env: too many arguments\n");
+		ms_error("env", NULL, "too many arguments", 1);
 		return (1);
 	}
 	i = 0;

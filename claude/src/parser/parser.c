@@ -44,7 +44,9 @@ static int	syntax_error_unexpected(t_shell *sh, t_token *tok)
 
 int	parse_pipeline(t_shell *sh, t_mem *mem, t_token *tok, t_pipeline *pl)
 {
-	if (!tok || tok->type == TOK_PIPE)
+	if (!tok)
+		return (1);
+	if (tok->type == TOK_PIPE)
 		return (syntax_error_unexpected(sh, tok));
 	pl->count = count_cmds(tok);
 	pl->cmds = ms_alloc(mem, sizeof(t_cmd) * pl->count);

@@ -31,14 +31,12 @@ int	bi_cd(t_shell *sh, t_cmd *cmd)
 	char	*target;
 
 	if (cmd->argv[1] != 0x00 && cmd->argv[2])
-		return (fprintf(stderr,
-				"minishell: cd: too many arguments\n"), 1);
+		return (ms_error("cd", NULL, "too many arguments", 1));
 	target = cmd->argv[1];
 	if (!target)
 		target = env_get(&sh->env, "HOME");
 	if (!target)
-		return (fprintf(stderr,
-				"minishell: cd: HOME not set\n"), 1);
+		return (ms_error("cd", NULL, "HOME not set", 1));
 	if (!getcwd(cwd, sizeof(cwd)))
 		cwd[0] = 0;
 	if (chdir(target) != 0)

@@ -13,6 +13,7 @@
 #include "expand_internal.h"
 #include "../mem/mem.h"
 #include "../parser/parser.h"
+#include "../core/core.h"
 
 /*
 ** Expand one argv word into *slot (arena memory).
@@ -90,8 +91,7 @@ static t_redirect	*expand_redir(t_shell *sh, t_mem *mem, t_redirect *src)
 		return (NULL);
 	if (src->type != REDIRECT_HEREDOC && !tmp[0])
 	{
-		fprintf(stderr, "minishell: %s: ambiguous redirect\n",
-			src->target);
+		ms_error(src->target, NULL, "ambiguous redirect", 1);
 		return (free(tmp), NULL);
 	}
 	dst->target = ms_strdup(mem, tmp);

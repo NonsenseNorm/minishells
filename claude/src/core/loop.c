@@ -36,7 +36,8 @@ int	ms_loop(t_shell *sh, char *line)
 	mem_reset(&lex_mem);
 	mem_init(&exp_mem);
 	if (expand_pipeline(sh, &exp_mem, &pl) != 0)
-		return (mem_reset(&parse_mem), mem_reset(&exp_mem), sh->exit_code);
+		return (mem_reset(&parse_mem), mem_reset(&exp_mem),
+			sh->exit_code = 1);
 	mem_reset(&parse_mem);
 	sh->exit_code = exec_pipeline(sh, &pl);
 	mem_reset(&exp_mem);
