@@ -15,8 +15,8 @@
 
 # include "../root.h"
 
-void	sig_init_echoctl(struct termios *term);
 void	sig_set_interactive(void);
+void	sig_set_noninteractive(void);
 void	sig_set_heredoc(void);
 void	sig_set_exec_parent(void);
 void	sig_set_exec_child(void);

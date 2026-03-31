@@ -94,7 +94,10 @@ void	ms_run(t_shell *sh)
 
 	while (1)
 	{
-		sig_set_interactive();
+		if (sh->interactive)
+			sig_set_interactive();
+		else
+			sig_set_noninteractive();
 		input = read_prompt(sh);
 		if (g_sig == SIGINT)
 		{

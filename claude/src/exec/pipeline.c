@@ -14,28 +14,23 @@
 #include "../signal/signal.h"
 #include "../heredoc/heredoc.h"
 
-static void	print_signal_msg(int status)
+static int	exit_status(int status)
 {
 	int	sig;
 
-	sig = WTERMSIG(status);
-	if (sig == SIGINT)
-		write(STDERR_FILENO, "\n", 1);
-	else if (sig == SIGQUIT)
-	{
-		write(STDERR_FILENO, "Quit", 4);
-		if (WCOREDUMP(status))
-			write(STDERR_FILENO, " (core dumped)", 14);
-		write(STDERR_FILENO, "\n", 1);
-	}
-}
-
-static int	exit_status(int status)
-{
 	if (WIFSIGNALED(status))
 	{
-		print_signal_msg(status);
-		return (128 + WTERMSIG(status));
+		sig = WTERMSIG(status);
+		if (sig == SIGINT)
+			write(STDERR_FILENO, "\n", 1);
+		else if (sig == SIGQUIT)
+		{
+			write(STDERR_FILENO, "Quit", 4);
+			if (WCOREDUMP(status))
+				write(STDERR_FILENO, " (core dumped)", 14);
+			write(STDERR_FILENO, "\n", 1);
+		}
+		return (128 + sig);
 	}
 	return (WEXITSTATUS(status));
 }
@@ -123,6 +118,9 @@ int	exec_forked_pipeline(t_shell *sh, t_pipeline *pl)
 	close_pipeline_heredocs(pl);
 	ret = wait_all(pids, pl->count);
 	free(pids);
-	sig_set_interactive();
+	if (sh->interactive)
+		sig_set_interactive();
+	else
+		sig_set_noninteractive();
 	return (ret);
 }

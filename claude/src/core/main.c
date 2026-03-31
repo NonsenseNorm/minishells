@@ -23,7 +23,6 @@ static int	init_shell(t_shell *sh, char **envp)
 	sh->exit_code = 0;
 	sh->interactive = isatty(STDIN_FILENO);
 	term_save(sh);
-	sig_init_echoctl(&sh->orig_term);
 	if (env_init(&sh->env, envp) != 0)
 		return (1);
 	return (0);
@@ -39,7 +38,7 @@ int	main(int argc, char **argv, char **envp)
 		return (1);
 	ms_run(&sh);
 	term_restore(&sh);
-	clear_history();
+	rl_clear_history();
 	env_free(&sh.env);
 	return (sh.exit_code);
 }

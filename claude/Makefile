@@ -1,6 +1,6 @@
 NAME = minishell
 CC = cc
-READLINE_PREFIX = $(shell brew --prefix readline 2>/dev/null || echo /usr/local)
+READLINE_PREFIX = /usr/local
 CFLAGS = -Wall -Wextra -Werror -I$(READLINE_PREFIX)/include
 LDFLAGS = -L$(READLINE_PREFIX)/lib -lreadline
 LIBFT_DIR = libft
