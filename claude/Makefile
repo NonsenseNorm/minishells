@@ -39,6 +39,7 @@ src/heredoc/heredoc_fd.c \
 src/heredoc/heredoc_gather.c \
 src/heredoc/heredoc_io.c \
 src/term/term.c \
+
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
