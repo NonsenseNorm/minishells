@@ -6,7 +6,7 @@
 /*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by stanizak          #+#    #+#             */
-/*   Updated: 2026/03/28 00:00:00 by stanizak         ###   ########.fr       */
+/*   Updated: 2026/03/30 23:05:34 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ static char	*read_prompt(t_shell *sh)
 {
 	char	*line;
 
-	ms_term_disable_echoctl(sh);
 	if (sh->interactive)
 		line = readline("minishell$ ");
 	else

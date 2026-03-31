@@ -12,13 +12,22 @@
 
 #include "signal.h"
 
+static int	g_echoctl;
+
 static void	sig_handler_interactive(int sig)
 {
 	g_sig = sig;
-	write(STDOUT_FILENO, "^C\n", 3);
+	if (g_echoctl)
+		write(STDOUT_FILENO, "^C", 2);
+	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
+}
+
+void	sig_init_echoctl(struct termios *term)
+{
+	g_echoctl = (term->c_lflag & ECHOCTL) != 0;
 }
 
 static void	sig_handler_heredoc(int sig)

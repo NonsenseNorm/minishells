@@ -28,6 +28,7 @@
 # include <string.h>
 # include <sys/stat.h>
 # include <sys/types.h>
+# include <sys/ioctl.h>
 # include <sys/wait.h>
 # include <termios.h>
 # include <unistd.h>
@@ -107,10 +108,9 @@ typedef struct s_mem
 typedef struct s_shell
 {
 	t_env			env;
+	struct termios	orig_term;
 	int				exit_code;
 	bool			interactive;
-	bool			term_saved;
-	struct termios	term_orig;
 }	t_shell;
 
 extern volatile sig_atomic_t	g_sig;

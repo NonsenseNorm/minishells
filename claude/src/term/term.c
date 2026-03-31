@@ -1,24 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.h                                           :+:      :+:    :+:   */
+/*   term.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/28 00:00:00 by stanizak          #+#    #+#             */
-/*   Updated: 2026/03/28 00:00:00 by stanizak         ###   ########.fr       */
+/*   Created: 2026/03/31 00:00:00 by stanizak          #+#    #+#             */
+/*   Updated: 2026/03/31 00:00:00 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SIGNAL_H
-# define SIGNAL_H
+#include "term.h"
 
-# include "../root.h"
+void	term_save(t_shell *sh)
+{
+	if (sh->interactive)
+		tcgetattr(STDIN_FILENO, &sh->orig_term);
+}
 
-void	sig_init_echoctl(struct termios *term);
-void	sig_set_interactive(void);
-void	sig_set_heredoc(void);
-void	sig_set_exec_parent(void);
-void	sig_set_exec_child(void);
-
-#endif
+void	term_restore(t_shell *sh)
+{
+	if (sh->interactive)
+		tcsetattr(STDIN_FILENO, TCSADRAIN, &sh->orig_term);
+}

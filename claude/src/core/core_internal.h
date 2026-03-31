@@ -15,7 +15,6 @@
 
 # include "core.h"
 
-void	ms_term_disable_echoctl(t_shell *sh);
 int		ms_loop(t_shell *sh, char *line);
 void	ms_run(t_shell *sh);
 
