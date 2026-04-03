@@ -55,7 +55,7 @@ void	heredoc_write(t_shell *sh, int fd, char *line, bool quoted)
 
 	if (!quoted)
 	{
-		tmp = expand_word(sh, line);
+		tmp = expand_heredoc_line(sh, line);
 		if (tmp)
 		{
 			free(line);

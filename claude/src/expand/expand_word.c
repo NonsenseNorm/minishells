@@ -76,6 +76,25 @@ char	*expand_word(t_shell *sh, const char *s)
 	return (out);
 }
 
+char	*expand_heredoc_line(t_shell *sh, const char *s)
+{
+	char	*out;
+	int		i;
+
+	out = ft_strdup("");
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == '$')
+			out = append_str(out, expand_var(sh, s, &i));
+		else
+			out = append_str(out, ft_substr(s, i++, 1));
+		if (!out)
+			return (NULL);
+	}
+	return (out);
+}
+
 char	*strip_quotes(const char *s)
 {
 	char	*out;

@@ -17,5 +17,6 @@
 
 int		expand_pipeline(t_shell *sh, t_mem *mem, t_pipeline *pl);
 char	*expand_word(t_shell *sh, const char *s);
+char	*expand_heredoc_line(t_shell *sh, const char *s);
 
 #endif
