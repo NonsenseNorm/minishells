@@ -35,7 +35,14 @@
       "Bash(norminette claude:*)",
       "Bash(valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --error-exitcode=1 ./minishell)",
       "Bash(norminette:*)",
-      "Bash(find /home/stanizak/minishells -name *.pdf -o -name *subject* -o -name *minishell.md*)"
+      "Bash(find /home/stanizak/minishells -name *.pdf -o -name *subject* -o -name *minishell.md*)",
+      "Bash(bash)",
+      "Bash(valgrind --leak-check=full --show-leak-kinds=all ./minishell)",
+      "Bash(valgrind --trace-children=no --leak-check=full --show-leak-kinds=all ./minishell)",
+      "Bash(valgrind --child-silent-after-fork=yes --leak-check=full --show-leak-kinds=reachable ./minishell)",
+      "Bash(bash -c 'export')",
+      "Bash(./claude/minishell)",
+      "Bash(/home/stanizak/minishells/claude/minishell)"
     ]
   }
 }
