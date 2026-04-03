@@ -24,6 +24,33 @@ static int	skip_ws_sign(const char **s)
 	return (1);
 }
 
+static long	parse_digits(const char **s, int sign, int *ok)
+{
+	unsigned long	limit;
+	unsigned long	n;
+
+	if (sign == 1)
+		limit = LONG_MAX;
+	else
+		limit = (unsigned long)LONG_MAX + 1;
+	n = 0;
+	while (ft_isdigit((unsigned char)**s))
+	{
+		if (n > (limit - (**s - '0')) / 10)
+		{
+			*ok = 0;
+			if (sign == 1)
+				return (LONG_MAX);
+			return (LONG_MIN);
+		}
+		n = n * 10 + (**s - '0');
+		(*s)++;
+	}
+	if (sign == -1)
+		return ((long)(~n + 1));
+	return ((long)n);
+}
+
 long	ft_atol(const char *s, int *ok)
 {
 	long	n;
@@ -33,22 +60,10 @@ long	ft_atol(const char *s, int *ok)
 	sign = skip_ws_sign(&s);
 	if (!ft_isdigit((unsigned char)*s))
 		return (*ok = 0, 0);
-	n = 0;
-	while (ft_isdigit((unsigned char)*s))
-	{
-		if (n > (LONG_MAX - (*s - '0')) / 10)
-		{
-			*ok = 0;
-			if (sign == 1)
-				return (LONG_MAX);
-			return (LONG_MIN);
-		}
-		n = n * 10 + (*s - '0');
-		s++;
-	}
+	n = parse_digits(&s, sign, ok);
 	while (ft_isspace((unsigned char)*s))
 		s++;
 	if (*s)
 		*ok = 0;
-	return (sign * n);
+	return (n);
 }

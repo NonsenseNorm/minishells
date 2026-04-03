@@ -91,7 +91,7 @@ static int	fork_all(t_shell *sh, t_pipeline *pl, pid_t *pids)
 			return (1);
 		pids[i] = fork();
 		if (pids[i] == 0)
-			fork_child(sh, &pl->cmds[i], prev, p);
+			(free(pids), fork_child(sh, &pl->cmds[i], prev, p));
 		if (prev != -1)
 			close(prev);
 		if (p[1] != -1)

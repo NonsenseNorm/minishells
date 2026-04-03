@@ -15,10 +15,22 @@
 #include "../heredoc/heredoc.h"
 #include "../builtin/builtin.h"
 #include "../core/core.h"
+#include "../env/env.h"
+#include "../mem/mem.h"
+
+static void	child_exit(t_shell *sh, int code)
+{
+	if (sh->cur_mem)
+		mem_reset(sh->cur_mem);
+	free(sh->cur_input);
+	env_free(&sh->env);
+	exit(code);
+}
 
 static void	exec_not_found(t_shell *sh, t_cmd *cmd)
 {
 	char	*path;
+	char	**envp;
 
 	path = find_exec_path(sh, cmd->argv[0]);
 	if (!path)
@@ -26,9 +38,16 @@ static void	exec_not_found(t_shell *sh, t_cmd *cmd)
 		ms_err("minishell: ");
 		ms_err(cmd->argv[0]);
 		ms_err(": command not found\n");
-		exit(127);
+		child_exit(sh, 127);
 	}
-	execve(path, cmd->argv, sh->env.arr);
+	envp = env_to_arr(&sh->env);
+	if (sh->cur_mem)
+		mem_reset(sh->cur_mem);
+	free(sh->cur_input);
+	env_free(&sh->env);
+	execve(path, cmd->argv, envp);
+	ft_free_split(envp);
+	free(path);
 	if (errno == ENOENT && ft_strchr(cmd->argv[0], '/'))
 		exit(ms_perror(cmd->argv[0], NULL, 127));
 	if (errno == ENOENT)
@@ -43,16 +62,16 @@ void	child_exec(t_shell *sh, t_cmd *cmd)
 	sig_set_exec_child();
 	ret = apply_redirects(sh, cmd->redirects);
 	if (ret != 0)
-		exit(ret);
+		child_exit(sh, ret);
 	ret = run_builtin(sh, cmd);
 	if (ret >= 0)
-		exit(ret);
+		child_exit(sh, ret);
 	if (!cmd->argv || !cmd->argv[0])
-		exit(0);
+		child_exit(sh, 0);
 	if (!cmd->argv[0][0])
 	{
 		ms_err("minishell: : command not found\n");
-		exit(127);
+		child_exit(sh, 127);
 	}
 	exec_not_found(sh, cmd);
 }

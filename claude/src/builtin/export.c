@@ -14,33 +14,52 @@
 #include "../env/env.h"
 #include "../core/core.h"
 
-int	valid_ident(const char *s)
+static void	sort_idx(int *idx, t_var *vars, int len)
 {
 	int	i;
+	int	j;
+	int	tmp;
 
-	if (!s || !(ft_isalpha(*s) || *s == '_'))
-		return (0);
-	i = 1;
-	while (s[i] && s[i] != '=' && !(s[i] == '+' && s[i + 1] == '='))
+	i = -1;
+	while (++i < len)
+		idx[i] = i;
+	i = -1;
+	while (++i < len - 1)
 	{
-		if (!(ft_isalnum(s[i]) || s[i] == '_'))
-			return (0);
-		i++;
+		j = i;
+		while (++j < len)
+		{
+			if (ft_strcmp(vars[idx[i]].key, vars[idx[j]].key) > 0)
+			{
+				tmp = idx[i];
+				idx[i] = idx[j];
+				idx[j] = tmp;
+			}
+		}
 	}
-	return (1);
 }
 
 static int	print_export(t_shell *sh)
 {
+	int	*idx;
 	int	i;
+	int	v;
 
-	i = 0;
-	while (i < sh->env.len)
+	idx = malloc(sizeof(int) * sh->env.len);
+	if (!idx)
+		return (1);
+	sort_idx(idx, sh->env.vars, sh->env.len);
+	i = -1;
+	while (++i < sh->env.len)
 	{
-		printf("declare -x %s\n", sh->env.arr[i]);
-		i++;
+		v = idx[i];
+		if (sh->env.vars[v].val)
+			printf("declare -x %s=\"%s\"\n", sh->env.vars[v].key,
+				sh->env.vars[v].val);
+		else
+			printf("declare -x %s\n", sh->env.vars[v].key);
 	}
-	return (0);
+	return (free(idx), 0);
 }
 
 static void	export_append(t_shell *sh, char *key, char *val)
@@ -66,7 +85,7 @@ static void	export_one(t_shell *sh, char *arg)
 
 	eq = ft_strchr(arg, '=');
 	if (!eq)
-		return (env_set(&sh->env, arg, "", true), (void)0);
+		return (env_set(&sh->env, arg, NULL, true), (void)0);
 	append = (eq > arg && *(eq - 1) == '+');
 	key = ft_substr(arg, 0, (size_t)(eq - append - arg));
 	if (!key)

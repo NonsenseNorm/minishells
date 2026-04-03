@@ -13,6 +13,22 @@
 #include "builtin.h"
 #include "builtin_internal.h"
 
+int	valid_ident(const char *s)
+{
+	int	i;
+
+	if (!s || !(ft_isalpha(*s) || *s == '_'))
+		return (0);
+	i = 1;
+	while (s[i] && s[i] != '=' && !(s[i] == '+' && s[i + 1] == '='))
+	{
+		if (!(ft_isalnum(s[i]) || s[i] == '_'))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	is_parent_builtin(t_cmd *cmd)
 {
 	if (!cmd->argv || !cmd->argv[0])

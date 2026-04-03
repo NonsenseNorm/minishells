@@ -25,8 +25,8 @@ int	bi_env(t_shell *sh, t_cmd *cmd)
 	i = 0;
 	while (i < sh->env.len)
 	{
-		if (ft_strchr(sh->env.arr[i], '='))
-			printf("%s\n", sh->env.arr[i]);
+		if (sh->env.vars[i].exported && sh->env.vars[i].val)
+			printf("%s=%s\n", sh->env.vars[i].key, sh->env.vars[i].val);
 		i++;
 	}
 	return (0);

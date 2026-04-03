@@ -79,9 +79,16 @@ typedef struct s_pipeline
 	int		count;
 }	t_pipeline;
 
+typedef struct s_var
+{
+	char	*key;
+	char	*val;
+	bool	exported;
+}	t_var;
+
 typedef struct s_env
 {
-	char	**arr;
+	t_var	*vars;
 	int		len;
 	int		cap;
 }	t_env;
@@ -109,6 +116,8 @@ typedef struct s_shell
 {
 	t_env			env;
 	struct termios	orig_term;
+	t_mem			*cur_mem;
+	char			*cur_input;
 	int				exit_code;
 	bool			interactive;
 }	t_shell;

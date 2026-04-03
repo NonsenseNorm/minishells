@@ -21,5 +21,6 @@ char	*env_get(t_env *env, const char *key);
 int		env_set(t_env *env, const char *key, const char *val, bool exp);
 int		env_unset(t_env *env, const char *key);
 int		env_grow(t_env *env);
+char	**env_to_arr(t_env *env);
 
 #endif

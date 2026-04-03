@@ -17,8 +17,8 @@ src/builtin/unset.c \
 src/core/error.c \
 src/core/loop.c \
 src/core/main.c \
-src/env/env.c \
 src/env/env_getset.c \
+src/env/env.c \
 src/exec/exec.c \
 src/exec/path.c \
 src/exec/redirect.c \
@@ -38,7 +38,7 @@ src/signal/signal_interactive.c \
 src/heredoc/heredoc_fd.c \
 src/heredoc/heredoc_gather.c \
 src/heredoc/heredoc_io.c \
-src/term/term.c \
+src/term/term.c
 
 OBJS = $(SRCS:.c=.o)
 

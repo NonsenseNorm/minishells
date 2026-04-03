@@ -39,7 +39,9 @@ int	ms_loop(t_shell *sh, char *line)
 		return (mem_reset(&parse_mem), mem_reset(&exp_mem),
 			sh->exit_code = 1);
 	mem_reset(&parse_mem);
+	sh->cur_mem = &exp_mem;
 	sh->exit_code = exec_pipeline(sh, &pl);
+	sh->cur_mem = NULL;
 	mem_reset(&exp_mem);
 	return (sh->exit_code);
 }
@@ -106,12 +108,10 @@ void	ms_run(t_shell *sh)
 		}
 		if (!input)
 			break ;
-		if (!*input)
-		{
-			free(input);
-			continue ;
-		}
-		process_input(sh, input);
+		sh->cur_input = input;
+		if (*input)
+			process_input(sh, input);
+		sh->cur_input = NULL;
 		free(input);
 	}
 	print_exit(sh);

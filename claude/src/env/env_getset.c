@@ -14,14 +14,12 @@
 
 static int	find_key(t_env *env, const char *key)
 {
-	int	klen;
 	int	i;
 
-	klen = ft_strlen(key);
 	i = 0;
 	while (i < env->len)
 	{
-		if (!ft_strncmp(env->arr[i], key, klen) && env->arr[i][klen] == '=')
+		if (!ft_strcmp(env->vars[i].key, key))
 			return (i);
 		i++;
 	}
@@ -31,53 +29,48 @@ static int	find_key(t_env *env, const char *key)
 char	*env_get(t_env *env, const char *key)
 {
 	int	idx;
-	int	klen;
 
 	idx = find_key(env, key);
 	if (idx < 0)
 		return (NULL);
-	klen = ft_strlen(key);
-	return (env->arr[idx] + klen + 1);
+	return (env->vars[idx].val);
 }
 
-static char	*make_kv(const char *key, const char *value)
+static int	set_new(t_env *env, const char *key, const char *val, bool exp)
 {
-	char	*kv;
-	size_t	klen;
-	size_t	vlen;
-
-	klen = ft_strlen(key);
-	vlen = ft_strlen(value);
-	kv = malloc(klen + vlen + 2);
-	if (!kv)
-		return (NULL);
-	ft_memcpy(kv, key, klen);
-	kv[klen] = '=';
-	ft_memcpy(kv + klen + 1, value, vlen);
-	kv[klen + vlen + 1] = 0;
-	return (kv);
-}
-
-int	env_set(t_env *env, const char *key, const char *value, bool export)
-{
-	char	*kv;
-	int		idx;
-
-	(void)export;
-	kv = make_kv(key, value);
-	if (!kv)
-		return (1);
-	idx = find_key(env, key);
-	if (idx >= 0)
-	{
-		free(env->arr[idx]);
-		env->arr[idx] = kv;
-		return (0);
-	}
 	if (env->len + 2 >= env->cap && env_grow(env) != 0)
-		return (free(kv), 1);
-	env->arr[env->len++] = kv;
-	env->arr[env->len] = NULL;
+		return (1);
+	env->vars[env->len].key = ft_strdup(key);
+	if (!env->vars[env->len].key)
+		return (1);
+	env->vars[env->len].val = NULL;
+	if (val)
+	{
+		env->vars[env->len].val = ft_strdup(val);
+		if (!env->vars[env->len].val)
+			return (free(env->vars[env->len].key), 1);
+	}
+	env->vars[env->len].exported = exp;
+	env->len++;
+	return (0);
+}
+
+int	env_set(t_env *env, const char *key, const char *val, bool exp)
+{
+	int	idx;
+
+	idx = find_key(env, key);
+	if (idx < 0)
+		return (set_new(env, key, val, exp));
+	if (val)
+	{
+		free(env->vars[idx].val);
+		env->vars[idx].val = ft_strdup(val);
+		if (!env->vars[idx].val)
+			return (1);
+	}
+	if (exp)
+		env->vars[idx].exported = true;
 	return (0);
 }
 
@@ -88,13 +81,14 @@ int	env_unset(t_env *env, const char *key)
 	idx = find_key(env, key);
 	if (idx < 0)
 		return (0);
-	free(env->arr[idx]);
+	free(env->vars[idx].key);
+	free(env->vars[idx].val);
 	while (idx + 1 < env->len)
 	{
-		env->arr[idx] = env->arr[idx + 1];
+		env->vars[idx] = env->vars[idx + 1];
 		idx++;
 	}
 	env->len--;
-	env->arr[env->len] = NULL;
+	ft_memset(&env->vars[env->len], 0, sizeof(t_var));
 	return (0);
 }
