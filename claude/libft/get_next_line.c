@@ -12,51 +12,26 @@
 
 #include "libft.h"
 
-static char	*gnl_join(char *buf, char *add, size_t add_len)
-{
-	char	*res;
-	size_t	buf_len;
-
-	if (!buf)
-		buf_len = 0;
-	else
-		buf_len = ft_strlen(buf);
-	res = malloc(buf_len + add_len + 1);
-	if (!res)
-	{
-		free(buf);
-		return (NULL);
-	}
-	if (buf)
-		ft_memcpy(res, buf, buf_len);
-	ft_memcpy(res + buf_len, add, add_len);
-	res[buf_len + add_len] = '\0';
-	free(buf);
-	return (res);
-}
-
 char	*get_next_line(int fd)
 {
-	char	c;
-	char	*line;
-	ssize_t	rd;
+	t_strbuf	sb;
+	char		c;
+	ssize_t		rd;
 
-	line = NULL;
+	sb_init(&sb);
 	while (1)
 	{
 		rd = read(fd, &c, 1);
 		if (rd <= 0)
 		{
-			if (rd == 0 && line)
-				return (line);
-			free(line);
-			return (NULL);
+			if (rd == 0 && sb.len > 0)
+				return (sb_detach(&sb));
+			return (free(sb.buf), NULL);
 		}
 		if (c == '\n')
 			break ;
-		line = gnl_join(line, &c, 1);
-		if (!line)
+		if (sb_append(&sb, &c, 1) < 0)
 			return (NULL);
 	}
-	return (line);
+	return (sb_detach(&sb));
 }

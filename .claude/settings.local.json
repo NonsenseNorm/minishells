@@ -42,7 +42,8 @@
       "Bash(valgrind --child-silent-after-fork=yes --leak-check=full --show-leak-kinds=reachable ./minishell)",
       "Bash(bash -c 'export')",
       "Bash(./claude/minishell)",
-      "Bash(/home/stanizak/minishells/claude/minishell)"
+      "Bash(/home/stanizak/minishells/claude/minishell)",
+      "Bash(grep:*)"
     ]
   }
 }

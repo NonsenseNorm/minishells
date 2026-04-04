@@ -73,4 +73,15 @@ long	ft_atol(const char *s, int *ok);
 void	ft_free_split(char **arr);
 char	*get_next_line(int fd);
 
+typedef struct s_strbuf
+{
+	char	*buf;
+	size_t	len;
+	size_t	cap;
+}	t_strbuf;
+
+void	sb_init(t_strbuf *sb);
+int		sb_append(t_strbuf *sb, const char *s, size_t n);
+char	*sb_detach(t_strbuf *sb);
+
 #endif

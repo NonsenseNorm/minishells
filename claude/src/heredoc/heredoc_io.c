@@ -15,31 +15,24 @@
 
 static char	*heredoc_read_canonical(void)
 {
-	char	buf[2];
-	char	*line;
-	char	*tmp;
-	ssize_t	r;
+	t_strbuf	sb;
+	char		c;
+	ssize_t		r;
 
-	line = ft_strdup("");
-	if (!line)
-		return (NULL);
+	sb_init(&sb);
 	while (1)
 	{
-		r = read(STDIN_FILENO, buf, 1);
+		r = read(STDIN_FILENO, &c, 1);
 		if (r <= 0)
 			break ;
-		buf[1] = 0;
-		if (buf[0] == '\n')
+		if (c == '\n')
 			break ;
-		tmp = ft_strjoin(line, buf);
-		free(line);
-		line = tmp;
-		if (!line)
+		if (sb_append(&sb, &c, 1) < 0)
 			return (NULL);
 	}
-	if (r <= 0 && !*line)
-		return (free(line), NULL);
-	return (line);
+	if (r <= 0 && sb.len == 0)
+		return (free(sb.buf), NULL);
+	return (sb_detach(&sb));
 }
 
 char	*heredoc_read_line(void)

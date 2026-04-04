@@ -38,61 +38,56 @@ static char	*expand_var(t_shell *sh, const char *s, int *i)
 	return (ft_strdup(val));
 }
 
-static char	*append_str(char *a, char *b)
-{
-	char	*tmp;
-
-	tmp = ft_strjoin(a, b);
-	free(a);
-	free(b);
-	return (tmp);
-}
-
 char	*expand_word(t_shell *sh, const char *s)
 {
-	char	*out;
-	char	q;
-	int		i;
+	t_strbuf	sb;
+	char		q;
+	int			i;
+	char		*tmp;
 
-	out = ft_strdup("");
+	sb_init(&sb);
 	q = 0;
 	i = 0;
 	while (s[i])
 	{
 		if (!q && (s[i] == '\'' || s[i] == '"'))
 			q = s[i++];
-		else if (q && s[i] == q)
-		{
+		else if (q && s[i] == q && ++i)
 			q = 0;
-			i++;
-		}
 		else if (s[i] == '$' && q != '\'')
-			out = append_str(out, expand_var(sh, s, &i));
+		{
+			tmp = expand_var(sh, s, &i);
+			if (!tmp || sb_append(&sb, tmp, ft_strlen(tmp)) < 0)
+				return (free(tmp), free(sb.buf), NULL);
+			free(tmp);
+		}
 		else
-			out = append_str(out, ft_substr(s, i++, 1));
-		if (!out)
-			return (NULL);
+			sb_append(&sb, &s[i++], 1);
 	}
-	return (out);
+	return (sb_detach(&sb));
 }
 
 char	*expand_heredoc_line(t_shell *sh, const char *s)
 {
-	char	*out;
-	int		i;
+	t_strbuf	sb;
+	int			i;
+	char		*tmp;
 
-	out = ft_strdup("");
+	sb_init(&sb);
 	i = 0;
 	while (s[i])
 	{
 		if (s[i] == '$')
-			out = append_str(out, expand_var(sh, s, &i));
+		{
+			tmp = expand_var(sh, s, &i);
+			if (!tmp || sb_append(&sb, tmp, ft_strlen(tmp)) < 0)
+				return (free(tmp), free(sb.buf), NULL);
+			free(tmp);
+		}
 		else
-			out = append_str(out, ft_substr(s, i++, 1));
-		if (!out)
-			return (NULL);
+			sb_append(&sb, &s[i++], 1);
 	}
-	return (out);
+	return (sb_detach(&sb));
 }
 
 char	*strip_quotes(const char *s)
