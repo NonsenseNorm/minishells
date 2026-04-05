@@ -24,6 +24,8 @@ static int	open_redirect(t_redirect *r)
 {
 	if (r->type == REDIRECT_IN)
 		return (open(r->target, O_RDONLY));
+	if (r->type == REDIRECT_RW)
+		return (open(r->target, O_RDWR | O_CREAT, 0644));
 	if (r->type == REDIRECT_OUT)
 		return (open_out(r->target, 0));
 	if (r->type == REDIRECT_APPEND)
@@ -44,7 +46,8 @@ int	apply_redirects(t_shell *sh, t_redirect *r)
 				return (130);
 			return (ms_perror(r->target, NULL, 1));
 		}
-		if (r->type == REDIRECT_IN || r->type == REDIRECT_HEREDOC)
+		if (r->type == REDIRECT_IN || r->type == REDIRECT_RW
+			|| r->type == REDIRECT_HEREDOC)
 			dup2(fd, STDIN_FILENO);
 		else
 			dup2(fd, STDOUT_FILENO);

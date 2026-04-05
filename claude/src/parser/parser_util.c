@@ -26,7 +26,8 @@ int	has_quote(const char *s)
 
 int	is_redirect(t_tok_type t)
 {
-	return (t == TOK_REDIRECT_IN || t == TOK_REDIRECT_OUT
+	return (t == TOK_REDIRECT_IN || t == TOK_REDIRECT_RW
+		|| t == TOK_REDIRECT_OUT
 		|| t == TOK_REDIRECT_APPEND || t == TOK_HEREDOC);
 }
 
@@ -40,6 +41,8 @@ static const char	*tok_repr(t_token *tok)
 		return ("|");
 	if (tok->type == TOK_REDIRECT_IN)
 		return ("<");
+	if (tok->type == TOK_REDIRECT_RW)
+		return ("<>");
 	if (tok->type == TOK_REDIRECT_OUT)
 		return (">");
 	if (tok->type == TOK_REDIRECT_APPEND)

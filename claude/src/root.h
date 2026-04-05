@@ -38,6 +38,7 @@ typedef enum e_tok_type
 	TOK_WORD,
 	TOK_PIPE,
 	TOK_REDIRECT_IN,
+	TOK_REDIRECT_RW,
 	TOK_REDIRECT_OUT,
 	TOK_REDIRECT_APPEND,
 	TOK_HEREDOC
@@ -53,6 +54,7 @@ typedef struct s_token
 typedef enum e_redirect_type
 {
 	REDIRECT_IN,
+	REDIRECT_RW,
 	REDIRECT_OUT,
 	REDIRECT_APPEND,
 	REDIRECT_HEREDOC

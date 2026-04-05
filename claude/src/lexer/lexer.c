@@ -41,13 +41,16 @@ static int	lex_op(t_mem *mem, const char *s, int *i, t_token **out)
 	type = TOK_PIPE;
 	if (s[*i] == '<' && s[*i + 1] == '<')
 		type = TOK_HEREDOC;
+	else if (s[*i] == '<' && s[*i + 1] == '>')
+		type = TOK_REDIRECT_RW;
 	else if (s[*i] == '>' && s[*i + 1] == '>')
 		type = TOK_REDIRECT_APPEND;
 	else if (s[*i] == '<')
 		type = TOK_REDIRECT_IN;
 	else if (s[*i] == '>')
 		type = TOK_REDIRECT_OUT;
-	if (type == TOK_HEREDOC || type == TOK_REDIRECT_APPEND)
+	if (type == TOK_HEREDOC || type == TOK_REDIRECT_RW
+		|| type == TOK_REDIRECT_APPEND)
 		*i += 2;
 	else
 		*i += 1;
