@@ -6,7 +6,7 @@
 /*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by stanizak          #+#    #+#             */
-/*   Updated: 2026/04/10 18:43:47 by stanizak         ###   ########.fr       */
+/*   Updated: 2026/04/10 19:36:37 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 # include <stddef.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdio.h>
+# include <limits.h>
+# include <stdint.h>
 
 typedef struct s_list
 {
