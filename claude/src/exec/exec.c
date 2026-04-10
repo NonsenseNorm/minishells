@@ -6,7 +6,7 @@
 /*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by stanizak          #+#    #+#             */
-/*   Updated: 2026/01/01 00:00:00 by stanizak         ###   ########.fr       */
+/*   Updated: 2026/04/10 20:04:22 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,7 @@
 
 static void	child_exit(t_shell *sh, int code)
 {
-	if (sh->cur_mem)
-		mem_reset(sh->cur_mem);
-	free(sh->cur_input);
-	env_free(&sh->env);
+	(void)sh;
 	exit(code);
 }
 
@@ -41,10 +38,6 @@ static void	exec_not_found(t_shell *sh, t_cmd *cmd)
 		child_exit(sh, 127);
 	}
 	envp = env_to_arr(&sh->env);
-	if (sh->cur_mem)
-		mem_reset(sh->cur_mem);
-	free(sh->cur_input);
-	env_free(&sh->env);
 	execve(path, cmd->argv, envp);
 	ft_free_split(envp);
 	free(path);
