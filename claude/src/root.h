@@ -14,6 +14,7 @@
 # define ROOT_H
 
 # include "../libft/libft.h"
+# include "utils/utils.h"
 # include <errno.h>
 # include <fcntl.h>
 # include <limits.h>

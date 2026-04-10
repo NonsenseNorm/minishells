@@ -38,7 +38,11 @@ src/signal/signal_interactive.c \
 src/heredoc/heredoc_fd.c \
 src/heredoc/heredoc_gather.c \
 src/heredoc/heredoc_io.c \
-src/term/term.c
+src/term/term.c \
+src/utils/ft_atol.c \
+src/utils/ft_free_split.c \
+src/utils/ft_isspace.c \
+src/utils/ft_strcmp.c
 
 OBJS = $(SRCS:.c=.o)
 
