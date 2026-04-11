@@ -12,6 +12,7 @@
 
 #include "core_internal.h"
 #include "../env/env.h"
+#include "../mem/mem.h"
 #include "../signal/signal.h"
 #include "../term/term.h"
 
@@ -30,6 +31,14 @@ static int	init_shell(t_shell *sh, char **envp)
 	return (0);
 }
 
+void	shell_cleanup(t_shell *sh)
+{
+	if (sh->cur_mem)
+		mem_reset(sh->cur_mem);
+	free(sh->cur_input);
+	env_free(&sh->env);
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_shell	sh;
@@ -41,6 +50,6 @@ int	main(int argc, char **argv, char **envp)
 	ms_run(&sh);
 	term_restore(&sh);
 	rl_clear_history();
-	env_free(&sh.env);
+	shell_cleanup(&sh);
 	return (sh.exit_code);
 }

@@ -16,11 +16,10 @@
 #include "../builtin/builtin.h"
 #include "../core/core.h"
 #include "../env/env.h"
-#include "../mem/mem.h"
 
 static void	child_exit(t_shell *sh, int code)
 {
-	(void)sh;
+	shell_cleanup(sh);
 	exit(code);
 }
 
@@ -42,10 +41,14 @@ static void	exec_not_found(t_shell *sh, t_cmd *cmd)
 	ft_free_split(envp);
 	free(path);
 	if (errno == ENOENT && ft_strchr(cmd->argv[0], '/'))
-		exit(ms_perror(cmd->argv[0], NULL, 127));
+	{
+		ms_perror(cmd->argv[0], NULL, 127);
+		child_exit(sh, 127);
+	}
 	if (errno == ENOENT)
-		exit(127);
-	exit(ms_perror(cmd->argv[0], NULL, 126));
+		child_exit(sh, 127);
+	ms_perror(cmd->argv[0], NULL, 126);
+	child_exit(sh, 126);
 }
 
 void	child_exec(t_shell *sh, t_cmd *cmd)

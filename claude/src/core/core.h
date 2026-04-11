@@ -18,5 +18,6 @@
 void	ms_err(const char *s);
 int		ms_error(char *ctx, char *arg, char *msg, int code);
 int		ms_perror(char *ctx, char *arg, int code);
+void	shell_cleanup(t_shell *sh);
 
 #endif
