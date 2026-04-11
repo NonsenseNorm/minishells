@@ -6,134 +6,110 @@
 /*   By: stanizak <stanizak@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/01 00:00:00 by stanizak          #+#    #+#             */
-/*   Updated: 2026/03/28 00:00:00 by stanizak         ###   ########.fr       */
+/*   Updated: 2026/04/11 00:00:00 by stanizak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expand_internal.h"
 #include "../mem/mem.h"
 #include "../parser/parser.h"
-#include "../core/core.h"
 
-/*
-** Expand one argv word into *slot (arena memory).
-** POSIX null-word removal: empty expansion of unquoted word → *slot = NULL.
-** Returns 0 on success (kept or dropped), 1 on allocation failure.
-*/
-static int	expand_argv_word(t_shell *sh, t_mem *mem, char *orig, char **slot)
+static int	count_exp_argc(t_shell *sh, t_cmd *cmd)
 {
-	char	*expanded;
+	int		i;
+	int		n;
+	char	*e;
 
-	*slot = NULL;
-	expanded = expand_word(sh, orig);
-	if (!expanded)
+	i = 0;
+	n = 0;
+	while (cmd->argv && cmd->argv[i])
+	{
+		e = expand_word(sh, cmd->argv[i]);
+		if (!e)
+			return (-1);
+		if (*e != '\0' || has_quote(cmd->argv[i]))
+		{
+			if (has_quote(cmd->argv[i]))
+				n++;
+			else
+				n += ifs_wc(e);
+		}
+		free(e);
+		i++;
+	}
+	return (n);
+}
+
+static int	add_split(t_mem *mem, char *exp, t_exp_ctx *ctx)
+{
+	char	**flds;
+	int		i;
+
+	flds = split_ifs(exp);
+	if (!flds)
 		return (1);
-	if (*expanded == '\0' && !has_quote(orig))
-		return (free(expanded), 0);
-	*slot = ms_strdup(mem, expanded);
-	free(expanded);
-	if (!*slot)
-		return (1);
+	i = 0;
+	while (flds[i])
+	{
+		ctx->nav[ctx->dst] = ms_strdup(mem, flds[i]);
+		if (!ctx->nav[ctx->dst])
+			return (ft_free_split(flds), 1);
+		ctx->dst++;
+		i++;
+	}
+	ft_free_split(flds);
 	return (0);
 }
 
-/*
-** Expand all argv words of one command into arena memory.
-** *slot == NULL after expand_argv_word means the word was dropped (null-word
-** removal); dst advances only when a word is kept.
-*/
+static int	fill_one(t_shell *sh, t_mem *mem, char *orig, t_exp_ctx *ctx)
+{
+	char	*exp;
+	int		ret;
+
+	exp = expand_word(sh, orig);
+	if (!exp)
+		return (1);
+	if (*exp == '\0' && !has_quote(orig))
+		return (free(exp), 0);
+	if (!has_quote(orig))
+	{
+		ret = add_split(mem, exp, ctx);
+		free(exp);
+		return (ret);
+	}
+	ctx->nav[ctx->dst] = ms_strdup(mem, exp);
+	free(exp);
+	if (!ctx->nav[ctx->dst])
+		return (1);
+	ctx->dst++;
+	return (0);
+}
+
 static int	expand_cmd_argv(t_shell *sh, t_mem *mem, t_cmd *cmd)
 {
-	char	**new_argv;
-	int		src;
-	int		dst;
-	int		argc;
+	int			total;
+	t_exp_ctx	ctx;
+	int			i;
 
-	argc = 0;
-	while (cmd->argv && cmd->argv[argc])
-		argc++;
-	new_argv = ms_alloc(mem, sizeof(char *) * (argc + 1));
-	if (!new_argv)
+	total = count_exp_argc(sh, cmd);
+	if (total < 0)
 		return (1);
-	src = 0;
-	dst = 0;
-	while (cmd->argv && cmd->argv[src])
+	ctx.nav = ms_alloc(mem, sizeof(char *) * (total + 1));
+	if (!ctx.nav)
+		return (1);
+	ctx.dst = 0;
+	i = 0;
+	while (cmd->argv && cmd->argv[i])
 	{
-		if (expand_argv_word(sh, mem, cmd->argv[src], &new_argv[dst]))
+		if (fill_one(sh, mem, cmd->argv[i], &ctx))
 			return (1);
-		dst += (new_argv[dst] != NULL);
-		src++;
+		i++;
 	}
-	new_argv[dst] = NULL;
-	cmd->argv = new_argv;
+	ctx.nav[ctx.dst] = NULL;
+	cmd->argv = ctx.nav;
 	return (0);
 }
 
-/*
-** Deep-copy and expand one redirect into arena memory.
-** Heredoc delimiters: strip quotes only (no $-expansion).
-** Other targets: full $-expansion and quote removal (expand_word).
-*/
-static t_redirect	*expand_redir(t_shell *sh, t_mem *mem, t_redirect *src)
-{
-	t_redirect	*dst;
-	char		*tmp;
-
-	dst = ms_alloc(mem, sizeof(*dst));
-	if (!dst)
-		return (NULL);
-	*dst = (t_redirect){src->type, NULL, src->quoted, src->fd, NULL};
-	if (src->type == REDIRECT_HEREDOC)
-		tmp = strip_quotes(src->target);
-	else
-		tmp = expand_word(sh, src->target);
-	if (!tmp)
-		return (NULL);
-	if (src->type != REDIRECT_HEREDOC && !tmp[0])
-	{
-		ms_error(src->target, NULL, "ambiguous redirect", 1);
-		return (free(tmp), NULL);
-	}
-	dst->target = ms_strdup(mem, tmp);
-	free(tmp);
-	if (!dst->target)
-		return (NULL);
-	return (dst);
-}
-
-/*
-** Expand all redirects of one command, rebuilding the linked list
-** into arena memory.
-*/
-static int	expand_cmd_redirects(t_shell *sh, t_mem *mem, t_cmd *cmd)
-{
-	t_redirect	*src;
-	t_redirect	*dst;
-	t_redirect	*tail;
-
-	src = cmd->redirects;
-	cmd->redirects = NULL;
-	tail = NULL;
-	while (src)
-	{
-		dst = expand_redir(sh, mem, src);
-		if (!dst)
-			return (1);
-		if (!tail)
-			cmd->redirects = dst;
-		else
-			tail->next = dst;
-		tail = dst;
-		src = src->next;
-	}
-	return (0);
-}
-
-/*
-** Expand all commands in a pipeline.
-** The cmds array is deep-copied into exp_mem so that parse_mem can be
-** freed immediately after (see ms_loop: parse_mem resets before exec).
-*/
 int	expand_pipeline(t_shell *sh, t_mem *mem, t_pipeline *pl)
 {
 	t_cmd	*new_cmds;

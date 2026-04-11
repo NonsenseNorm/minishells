@@ -24,6 +24,8 @@ src/exec/path.c \
 src/exec/redirect.c \
 src/exec/pipeline.c \
 src/expand/expand.c \
+src/expand/expand_redir.c \
+src/expand/expand_split.c \
 src/expand/expand_word.c \
 src/lexer/lexer.c \
 src/lexer/lexer_word.c \

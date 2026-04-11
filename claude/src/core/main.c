@@ -20,7 +20,6 @@ volatile sig_atomic_t	g_sig;
 
 static int	init_shell(t_shell *sh, char **envp)
 {
-	rl_catch_signals = 0;
 	sh->exit_code = 0;
 	sh->cur_mem = NULL;
 	sh->cur_input = NULL;
